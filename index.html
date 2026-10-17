@@ -3,183 +3,200 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Европа XVIII века: 3D Квест от 3-го лица</title>
+    <title>Европа XVIII века: Настоящее 3D от 3-го лица</title>
+    <!-- Подключаем стабильный 3D-движок через безопасный CDN jsDelivr -->
+    <script src="https://jsdelivr.net"></script>
     <style>
-        body { margin: 0; padding: 0; overflow: hidden; background-color: #2c1d11; font-family: Arial, sans-serif; }
+        body { margin: 0; padding: 0; overflow: hidden; background-color: #1a1a2e; font-family: Arial, sans-serif; }
         
-        /* Игровой экран */
-        #game-view {
-            position: relative; width: 100vw; height: 100vh;
-            background-color: #cca474; /* Цвет брусчатки площади */
-            overflow: hidden;
-            perspective: 600px; /* Эффект 3D перспективы в браузере! */
-        }
-
-        /* Виртуальный 3D-мир (карта, которая двигается вокруг игрока) */
-        #world {
-            position: absolute; width: 2000px; height: 2000px;
-            left: 50%; top: 50%;
-            transform-style: preserve-3d;
-            transform: rotateX(55deg) translate3d(-1000px, -1000px, 0); /* Наклон от 3-го лица */
-            transition: transform 0.1s linear;
-        }
-
-        /* Сетка площади */
-        #grid {
-            position: absolute; width: 100%; height: 100%;
-            background-image: linear-gradient(#bfa280 2px, transparent 2px), linear-gradient(90deg, #bfa280 2px, transparent 2px);
-            background-size: 60px 60px;
-        }
-
-        /* Трёхмерное здание (3D House) */
-        .house {
-            position: absolute; width: 120px; height: 120px;
-            transform-style: preserve-3d;
-        }
-        .wall {
-            position: absolute; width: 100%; height: 130px;
-            background-color: #8d6e63; border: 3px solid #3e2723;
-            box-sizing: border-box; transform-origin: bottom;
-        }
-        /* Разворачиваем стены в 3D куб */
-        .front  { transform: rotateX(-90deg) translateZ(0px); background-color: #a1887f; }
-        .back   { transform: rotateX(-90deg) translateZ(-120px); background-color: #5d4037; }
-        .left   { transform: rotateY(-90deg) rotateX(-90deg) translateZ(0px); width: 120px; background-color: #8d6e63; }
-        .right  { transform: rotateY(90deg) rotateX(-90deg) translateZ(-120px); width: 120px; background-color: #4e342e; }
-        .roof   { 
-            position: absolute; width: 120px; height: 120px; 
-            background: #4caf50; border: 3px solid #1b5e20;
-            transform: translateZ(130px); 
-        }
-
-        /* Научный луч (Станция) */
-        .neon-beam {
-            position: absolute; width: 40px; height: 40px; border-radius: 50%;
-            transform-style: preserve-3d;
-        }
-        .laser {
-            position: absolute; width: 8px; height: 350px; left: 16px; bottom: 0;
-            transform: rotateX(-90deg); transform-origin: bottom;
-            box-shadow: 0 0 20px currentcolor;
-        }
-
-        /* Персонаж от 3-го лица (стоит мертво в центре экрана) */
-        #player {
-            position: absolute; width: 30px; height: 60px;
-            left: 50%; top: 50%; margin-left: -15px; margin-top: -45px;
-            z-index: 50; pointer-events: none;
-        }
-        .hero-body { width: 30px; height: 45px; background: #0288d1; border: 2px solid #01579b; border-radius: 4px; }
-        .hero-head { width: 18px; height: 18px; background: #ffcc80; border-radius: 50%; border: 2px solid #000; margin: -55px auto 0 auto; }
-        .hero-hat { width: 34px; height: 10px; background: #212121; margin: -67px auto 0 -2px; border-radius: 3px; }
-
-        /* Интерфейс (Свиток задания) */
+        /* Исторический свиток задания */
         #quest-ui {
-            position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%);
-            width: 85%; max-width: 530px; background: rgba(255, 248, 235, 0.98); color: #2b1a0e; 
-            padding: 22px; border-radius: 12px; border: 3px double #5c3a21; 
-            box-shadow: 0 10px 40px rgba(0,0,0,0.6); text-align: center; display: none; z-index: 1000;
+            position: absolute; bottom: 35px; left: 50%; transform: translateX(-50%);
+            width: 85%; max-width: 530px; background: rgba(255, 248, 235, 0.96); color: #2b1a0e; 
+            padding: 24px; border-radius: 12px; border: 3px double #5c3a21; 
+            box-shadow: 0 10px 40px rgba(0,0,0,0.7); text-align: center; display: none; z-index: 100;
         }
         .ans-btn {
-            background-color: #8c6239; color: white; border: none; padding: 12px 18px;
-            margin: 5px; cursor: pointer; font-size: 15px; border-radius: 6px; font-weight: bold;
+            background-color: #8c6239; color: white; border: none; padding: 12px 20px;
+            margin: 6px; cursor: pointer; font-size: 15px; border-radius: 6px; font-weight: bold;
         }
         .ans-btn:hover { background-color: #5c3a21; }
         
+        /* Панель подсказок */
         #top-bar {
-            position: absolute; top: 15px; left: 15px; background: rgba(44, 29, 17, 0.85);
+            position: absolute; top: 15px; left: 15px; background: rgba(44, 29, 17, 0.88);
             color: #fff; padding: 12px 18px; border-radius: 6px; font-size: 14px; 
-            pointer-events: none; border: 1px solid #8c6239; z-index: 1000;
+            pointer-events: none; border: 1px solid #8c6239; z-index: 100;
         }
     </style>
 </head>
 <body>
 
-    <div id="game-view">
-        <div id="top-bar">
-            <strong>📜 3D-Город Науки (Вид от 3-го лица)</strong><br>
-            • Управление: <strong>W, A, S, D</strong> или <strong>Стрелочки</strong><br>
-            • Задача: Дойди персонажем до светящихся неоновых лучей!
-        </div>
+    <div id="top-bar">
+        <strong style="color: #ffb74d;">📜 3D-Город Науки (Вид от третьего лица)</strong><br style="margin-bottom: 4px;">
+        • Ходить: <strong>W, A, S, D</strong> или <strong>Стрелочки</strong><br>
+        • Цель: Дойдите персонажем до высоких цветных лучей света!
+    </div>
 
-        <!-- 3D Мир, который двигается вокруг стоящего в центре игрока -->
-        <div id="world">
-            <div id="grid"></div>
-            
-            <!-- 4 объёмных исторических здания со станциями -->
-            <!-- Ньютон -->
-            <div class="house" style="left: 700px; top: 700px;">
-                <div class="wall front"></div><div class="wall back"></div>
-                <div class="wall left"></div><div class="wall right"></div>
-                <div class="roof" style="background: #4caf50;"></div>
-                <div style="position:absolute; color:#fff; font-weight:bold; transform:translateZ(170px); width:150px; text-align:center; left:-15px;">Ньютон</div>
-            </div>
-            <div class="neon-beam" style="left: 740px; top: 850px; color: #4caf50;"><div class="laser" style="background: #4caf50;"></div></div>
-
-            <!-- Франклин -->
-            <div class="house" style="left: 1200px; top: 700px;">
-                <div class="wall front"></div><div class="wall back"></div>
-                <div class="wall left"></div><div class="wall right"></div>
-                <div class="roof" style="background: #2196f3;"></div>
-                <div style="position:absolute; color:#fff; font-weight:bold; transform:translateZ(170px); width:150px; text-align:center; left:-15px;">Франклин</div>
-            </div>
-            <div class="neon-beam" style="left: 1240px; top: 850px; color: #2196f3;"><div class="laser" style="background: #2196f3;"></div></div>
-
-            <!-- Монгольфье -->
-            <div class="house" style="left: 700px; top: 1200px;">
-                <div class="wall front"></div><div class="wall back"></div>
-                <div class="wall left"></div><div class="wall right"></div>
-                <div class="roof" style="background: #ff9800;"></div>
-                <div style="position:absolute; color:#fff; font-weight:bold; transform:translateZ(170px); width:150px; text-align:center; left:-15px;">Монгольфье</div>
-            </div>
-            <div class="neon-beam" style="left: 740px; top: 1350px; color: #ff9800;"><div class="laser" style="background: #ff9800;"></div></div>
-
-            <!-- Лавуазье -->
-            <div class="house" style="left: 1200px; top: 1200px;">
-                <div class="wall front"></div><div class="wall back"></div>
-                <div class="wall left"></div><div class="wall right"></div>
-                <div class="roof" style="background: #e91e63;"></div>
-                <div style="position:absolute; color:#fff; font-weight:bold; transform:translateZ(170px); width:150px; text-align:center; left:-15px;">Лавуазье</div>
-            </div>
-            <div class="neon-beam" style="left: 1240px; top: 1350px; color: #e91e63;"><div class="laser" style="background: #e91e63;"></div></div>
-        </div>
-
-        <!-- Житель города (Игрок) строго по центру -->
-        <div id="player">
-            <div class="hero-body"></div>
-            <div class="hero-head"></div>
-            <div class="hero-hat"></div>
-        </div>
-
-        <!-- Квест -->
-        <div id="quest-ui">
-            <h2 id="q-title" style="color: #5c3a21; margin-top: 0;">Станция</h2>
-            <p id="q-text" style="line-height: 1.5; text-align: justify;"></p>
-            <p><strong id="q-question">Вопрос...</strong></p>
-            <div id="q-answers"></div>
-            <br>
-            <button class="ans-btn" style="background-color: #b71c1c;" onclick="closeQuest()">Закрыть ❌</button>
-        </div>
+    <div id="quest-ui">
+        <h2 id="q-title" style="color: #5c3a21; margin-top: 0;">Станция</h2>
+        <p id="q-text" style="line-height: 1.5; text-align: justify;"></p>
+        <p><strong id="q-question">Вопрос...</strong></p>
+        <div id="q-answers"></div>
+        <br>
+        <button class="ans-btn" style="background-color: #b71c1c;" onclick="closeQuest()">Закрыть ❌</button>
     </div>
 
     <script>
-        const world = document.getElementById('world');
-        const ui = document.getElementById('quest-ui');
+        // --- Инициализация полноценной 3D сцены ---
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0xb5c6e0); // Мягкое европейское небо
+        scene.fog = new THREE.FogExp2(0xb5c6e0, 0.02);
 
-        // Позиция игрока на виртуальной карте (центр = 1000, 1000)
-        let pX = 1000;
-        let pY = 1000;
-        const speed = 7;
+        const camera = new THREE.PerspectiveCamera(65, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.shadowMap.enabled = true;
+        document.body.appendChild(renderer.domElement);
+
+        // --- Освещение городка ---
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
+        scene.add(ambientLight);
+
+        const sunLight = new THREE.DirectionalLight(0xfff3e0, 0.8);
+        sunLight.position.set(15, 30, 20);
+        sunLight.castShadow = true;
+        scene.add(sunLight);
+
+        // --- Каменная мостовая площади ---
+        const floorGeo = new THREE.PlaneGeometry(120, 120);
+        const floorMat = new THREE.MeshStandardMaterial({ color: 0x766c61, roughness: 0.8 });
+        const floor = new THREE.Mesh(floorGeo, floorMat);
+        floor.rotation.x = -Math.PI / 2;
+        floor.receiveShadow = true;
+        scene.add(floor);
+
+        // --- Декорации: Стены и дома на площади ---
+        function create3DHouse(x, z, w, h, d, wallColor, roofColor) {
+            const house = new THREE.Group();
+            const wallGeo = new THREE.BoxGeometry(w, h, d);
+            const wallMat = new THREE.MeshStandardMaterial({ color: wallColor, roughness: 0.6 });
+            const walls = new THREE.Mesh(wallGeo, wallMat);
+            walls.position.y = h / 2;
+            walls.castShadow = true;
+            walls.receiveShadow = true;
+            house.add(walls);
+
+            const roofGeo = new THREE.ConeGeometry(w * 0.75, 4, 4);
+            const roofMat = new THREE.MeshStandardMaterial({ color: roofColor });
+            const roof = new THREE.Mesh(roofGeo, roofMat);
+            roof.position.y = h + 2;
+            roof.rotation.y = Math.PI / 4;
+            roof.castShadow = true;
+            house.add(roof);
+
+            house.position.set(x, 0, z);
+            scene.add(house);
+        }
+
+        // Строим 3D-архитектуру по краям площади
+        create3DHouse(-20, -22, 11, 10, 11, 0xa1887f, 0x5d4037);
+        create3DHouse(20, -22, 11, 12, 11, 0xbcaaa4, 0x4e342e);
+        create3DHouse(-24, 6, 12, 9, 9, 0x8d6e63, 0x212121);
+        create3DHouse(24, 6, 12, 9, 9, 0xd7ccc8, 0x3e2723);
+
+        // Центральный круглый фонтан города
+        const fountainGeo = new THREE.CylinderGeometry(2.5, 2.7, 0.6, 16);
+        const fountainMat = new THREE.MeshStandardMaterial({ color: 0x555555 });
+        const fountain = new THREE.Mesh(fountainGeo, fountainMat);
+        fountain.position.set(0, 0.3, 0);
+        scene.add(fountain);
+
+        // --- Трёхмерный Персонаж от 3-го лица ---
+        const playerGroup = new THREE.Group();
+        
+        // Одежда / Камзол
+        const bodyGeo = new THREE.CylinderGeometry(0.35, 0.5, 1.1, 10);
+        const bodyMat = new THREE.MeshStandardMaterial({ color: 0x0288d1, roughness: 0.5 });
+        const body = new THREE.Mesh(bodyGeo, bodyMat);
+        body.position.y = 0.85;
+        body.castShadow = true;
+        playerGroup.add(body);
+
+        // Голова
+        const headGeo = new THREE.SphereGeometry(0.26, 16, 16);
+        const headMat = new THREE.MeshStandardMaterial({ color: 0xffcc80 });
+        const head = new THREE.Mesh(headGeo, headMat);
+        head.position.y = 1.5;
+        head.castShadow = true;
+        playerGroup.add(head);
+
+        // Историческая треуголка
+        const hatGeo = new THREE.ConeGeometry(0.45, 0.28, 3);
+        const hatMat = new THREE.MeshStandardMaterial({ color: 0x212121 });
+        const hat = new THREE.Mesh(hatGeo, hatMat);
+        hat.position.y = 1.74;
+        hat.rotation.y = Math.PI / 2;
+        playerGroup.add(hat);
+
+        playerGroup.position.set(0, 0, 14); // Стартовая позиция у фонтана
+        scene.add(playerGroup);
+
+        const moveState = { speed: 0.16, rotSpeed: 0.05 };
         const keys = {};
 
+        // --- НАУЧНЫЕ СТАНЦИИ (3D Лучи и Кристаллы) ---
         const stations = [
-            { x: 740, y: 850, title: '🏛️ Станция Исаака Ньютона', info: 'В начале 18 века Ньютон совершил революцию в оптике, объяснив устройство радуги и разложив белый свет через призму.', question: 'Как называется распад света на цвета спектра?', answers: ['Дисперсия', 'Дифракция', 'Интерференция'], correct: 0 },
-            { x: 1240, y: 850, title: '⚡ Станция Б. Франклина', info: 'В 1752 году Франклин поймал молнию воздушным змеем и доказал, что это электричество.', question: 'Какое защитное устройство он изобрел после этого?', answers: ['Громоотвод', 'Изолятор', 'Резистор'], correct: 0 },
-            { x: 740, y: 1350, title: '🎈 Станция братьев Монгольфье', info: 'В 1783 году во Франции их воздушный шар впервые поднял человека в воздух.', question: 'Каким газом они наполняли шар?', answers: ['Гелием', 'Горячим дымом/воздухом', 'Водородом'], correct: 1 },
-            { x: 1240, y: 1350, title: '🧪 Станция А. Лавуазье', info: 'Лавуазье создал современную химию, доказав, что для горения необходим кислород.', question: 'Какую старую ложную теорию горения он опроверг?', answers: ['Теорию флогистона', 'Теорию алхимии', 'Теорию эфира'], correct: 0 }
+            { id: 1, x: -10, z: -7, color: 0x4caf50, crystal: null, title: '🏛️ Станция Исаака Ньютона', info: 'В начале 18 века Ньютон совершил революцию в оптике, объяснив устройство радуги и разложив белый свет через призму.', question: 'Как называется распад света на цвета спектра?', answers: ['Дисперсия', 'Дифракция', 'Интерференция'], correct: 0 },
+            { id: 2, x: 10, z: -7, color: 0x2196f3, crystal: null, title: '⚡ Станция Б. Франклина', info: 'В 1752 году Франклин поймал молнию воздушным змеем и доказал, что это электричество.', question: 'Какое защитное устройство он изобрел после этого?', answers: ['Громоотвод', 'Изолятор', 'Резистор'], correct: 0 },
+            { id: 3, x: -10, z: 7, color: 0xff9800, crystal: null, title: '🎈 Станция братьев Монгольфье', info: 'В 1783 году во Франции их воздушный шар впервые поднял человека в воздух.', question: 'Каким газом они наполняли шар?', answers: ['Гелием', 'Горячим дымом/воздухом', 'Водородом'], correct: 1 },
+            { id: 4, x: 10, z: 7, color: 0xe91e63, crystal: null, title: '🧪 Станция А. Лавуазье', info: 'Лавуазье создал современную химию, доказав, что для горения необходим кислород.', question: 'Какую старую ложную теорию горения он опроверг?', answers: ['Теорию флогистона', 'Теорию алхимии', 'Теорию эфира'], correct: 0 }
         ];
 
+        stations.forEach(s => {
+            // Большой полупрозрачный 3D луч света на станции
+            const beamGeo = new THREE.CylinderGeometry(0.8, 0.8, 14, 16, 1, true);
+            const beamMat = new THREE.MeshBasicMaterial({ color: s.color, transparent: true, opacity: 0.35, side: THREE.DoubleSide });
+            const beam = new THREE.Mesh(beamGeo, beamMat);
+            beam.position.set(s.x, 7, s.z);
+            scene.add(beam);
+
+            // Кристалл, парящий внутри луча
+            const cryGeo = new THREE.OctahedronGeometry(0.35, 0);
+            const cryMat = new THREE.MeshStandardMaterial({ color: s.color, roughness: 0.3, metalness: 0.4 });
+            const crystal = new THREE.Mesh(cryGeo, cryMat);
+            crystal.position.set(s.x, 2.3, s.z);
+            scene.add(crystal);
+            s.crystal = crystal;
+        });
+
+        // Перехват клавиш
         window.addEventListener('keydown', e => keys[e.key.toLowerCase()] = true);
         window.addEventListener('keyup', e => keys[e.key.toLowerCase()] = false);
 
-        function gameLoop() {
+        const ui = document.getElementById('quest-ui');
+
+        function updateLogic() {
+            if (ui.style.display === 'block') return;
+
+            // Движение вперёд и назад (по направлению взгляда персонажа)
+            if (keys['w'] || keys['arrowup']) {
+                playerGroup.translateZ(-moveState.speed);
+            }
+            if (keys['s'] || keys['arrowdown']) {
+                playerGroup.translateZ(moveState.speed);
+            }
+            // Повороты влево и вправо
+            if (keys['a'] || keys['arrowleft']) {
+                playerGroup.rotation.y += moveState.rotSpeed;
+            }
+            if (keys['d'] || keys['arrowright']) {
+                playerGroup.rotation.y -= moveState.rotSpeed;
+            }
+
+            // Барьеры города (чтобы не уйти за текстуры)
+            playerGroup.position.x = Math.max(-40, Math.min(40, playerGroup.position.x));
+            playerGroup.position.z = Math.max(-40, Math.min(40, playerGroup.position.z));
+
+            // Проверка близости к неоновым лучам
+            stations.forEach(s => {
