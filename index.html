@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Европа XVIII века: Город Науки</title>
+    <style>
+        body {
+            margin: 0; padding: 0; background-color: #1a0f07;
+            font-family: Arial, sans-serif;
+            display: flex; justify-content: center; align-items: center; height: 100vh;
+            overflow: hidden;
+        }
+        #game-wrapper { position: relative; width: 800px; height: 600px; box-shadow: 0 10px 30px rgba(0,0,0,0.8); }
+        canvas { background-color: #cca474; display: block; border: 4px solid #5c3a21; border-radius: 6px; }
+        
+        /* Свиток с заданием */
+        #quest-ui {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 75%; max-width: 500px; background: #fff8eb; color: #2b1a0e; padding: 25px;
+            border-radius: 12px; border: 3px double #5c3a21; box-shadow: 0 10px 40px rgba(0,0,0,0.7);
+            text-align: center; display: none; z-index: 10;
+        }
+        .ans-btn {
+            background-color: #8c6239; color: white; border: none; padding: 12px 18px;
+            margin: 6px; cursor: pointer; font-size: 15px; border-radius: 6px; font-weight: bold;
+        }
+        .ans-btn:hover { background-color: #5c3a21; }
+        
+        /* Верхняя панель */
+        #top-bar {
+            position: absolute; top: 15px; left: 15px; background: rgba(44, 29, 17, 0.9);
+            color: #fff; padding: 12px 18px; border-radius: 6px; font-size: 14px; 
+            pointer-events: none; border: 1px solid #8c6239;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="game-wrapper">
+        <div id="top-bar">
+            <strong>📜 Квест: Наука Европы XVIII века</strong><br>
+            • Управление: <strong>WASD</strong> или <strong>Стрелочки</strong><br>
+            • Задача: Подойди к любому из 4-х объёмных научных зданий!
+        </div>
+
+        <canvas id="townCanvas" width="800" height="600"></canvas>
+
+        <div id="quest-ui">
+            <h2 id="q-title" style="color: #5c3a21; margin-top: 0;">Станция</h2>
+            <p id="q-text" style="line-height: 1.5; text-align: justify;"></p>
+            <p><strong id="q-question">Вопрос...</strong></p>
+            <div id="q-answers"></div>
+            <br>
+            <button class="ans-btn" style="background-color: #b71c1c;" onclick="closeQuest()">Закрыть ❌</button>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('townCanvas');
+        const ctx = canvas.getContext('2d');
+        const ui = document.getElementById('quest-ui');
+
+        // Игрок (персонаж в треуголке)
+        const player = { x: 400, y: 300, size: 16, speed: 4.5, color: '#0288d1' };
+        const keys = {};
+
+        // 4 исторические станции (Объёмные здания)
+        const buildings = [
+            { x: 120, y: 100, w: 90, h: 70, wallColor: '#a1887f', roofColor: '#4caf50', label: 'Ньютон (Оптика)', title: '🏛️ Станция Исаака Ньютона', info: 'В начале 18 века Ньютон совершил революцию в оптике, объяснив устройство радуги и разложив белый свет через призму.', question: 'Как называется распад света на цвета спектра?', answers: ['Дисперсия', 'Дифракция', 'Интерференция'], correct: 0 },
+            { x: 580, y: 100, w: 90, h: 70, wallColor: '#bcaaa4', roofColor: '#2196f3', label: 'Франклин (Физика)', title: '⚡ Станция Б. Франклина', info: 'В 1752 году Франклин поймал молнию воздушным змеем и доказал, что это электричество.', question: 'Какое защитное устройство он изобрел после этого?', answers: ['Громоотвод', 'Изолятор', 'Резистор'], correct: 0 },
+            { x: 120, y: 400, w: 90, h: 70, wallColor: '#8d6e63', roofColor: '#ff9800', label: 'Монгольфье (Полёты)', title: '🎈 Станция братьев Монгольфье', info: 'В 1783 году во Франции их воздушный шар впервые поднял человека в воздух.', question: 'Каким газом они наполняли шар?', answers: ['Гелием', 'Горячим дымом/воздухом', 'Водородом'], correct: 1 },
+            { x: 580, y: 400, w: 90, h: 70, wallColor: '#d7ccc8', roofColor: '#e91e63', label: 'Лавуазье (Химия)', title: '🧪 Станция А. Лавуазье', info: 'Лавуазье создал современную химию, доказав, что для горения необходим кислород.', question: 'Какую старую ложную теорию горения он опроверг?', answers: ['Теорию флогистона', 'Теорию алхимии', 'Теорию эфира'], correct: 0 }
+        ];
+
+        window.addEventListener('keydown', e => keys[e.key.toLowerCase()] = true);
+        window.addEventListener('keyup', e => keys[e.key.toLowerCase()] = false);
+
+        // Функция рисования псевдо-3D дома (Изометрия)
+        function draw3DHouse(x, y, w, h, wallColor, roofColor, label) {
+            let offset = 20; // Сдвиг для эффекта объема
+
+            // 1. Задняя тень/объем стены
+            ctx.fillStyle = '#3e2723';
+            ctx.fillRect(x + offset, y - offset, w, h);
+
+            // 2. Основная передняя стена
+            ctx.fillStyle = wallColor;
+            ctx.fillRect(x, y, w, h);
+            ctx.strokeStyle = '#2b1a0e';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(x, y, w, h);
+
+            // 3. Окна и дверь здания
+            ctx.fillStyle = '#e0f7fa';
+            ctx.fillRect(x + 15, y + 15, 20, 20);
+            ctx.fillRect(x + w - 35, y + 15, 20, 20);
+            ctx.fillStyle = '#5c3a21';
+            ctx.fillRect(x + w/2 - 10, y + h - 25, 20, 25);
+
+            // 4. Боковая стена (соединение объёма)
+            ctx.fillStyle = '#4e342e';
+            ctx.beginPath();
+            ctx.moveTo(x + w, y);
+            ctx.lineTo(x + w + offset, y - offset);
+            ctx.lineTo(x + w + offset, y - offset + h);
+            ctx.lineTo(x + w, y + h);
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
+
+            // 5. Объёмная 3D Крыша
+            ctx.fillStyle = roofColor;
+            ctx.beginPath();
+            ctx.moveTo(x, y);
+            ctx.lineTo(x + w/2, y - offset * 1.8);
+            ctx.lineTo(x + w, y);
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.moveTo(x + w, y);
+            ctx.lineTo(x + w/2, y - offset * 1.8);
+            ctx.lineTo(x + w/2 + offset, y - offset * 2.3);
+            ctx.lineTo(x + w + offset, y - offset);
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
+
+            // Подпись над зданием
+            ctx.fillStyle = '#fff8eb';
+            ctx.font = 'bold 13px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText(label, x + w/2, y + h + 20);
+        }
+
+        function loop() {
+            if (ui.style.display !== 'block') {
+                if (keys['w'] || keys['arrowup']) player.y -= player.speed;
+                if (keys['s'] || keys['arrowdown']) player.y += player.speed;
+                if (keys['a'] || keys['arrowleft']) player.x -= player.speed;
+                if (keys['d'] || keys['arrowright']) player.x += player.speed;
+
+                if (player.x < 15) player.x = 15;
+                if (player.x > canvas.width - 15) player.x = canvas.width - 15;
+                if (player.y < 15) player.y = 15;
+                if (player.y > canvas.height - 15) player.y = canvas.height - 15;
+
+                // Проверка приближения к домам
+                buildings.forEach(b => {
+                    if (player.x > b.x - 10 && player.x < b.x + b.w + 20 &&
+                        player.y > b.y - 10 && player.y < b.y + b.h + 10) {
+                        openQuest(b);
+                    }
+                });
+            }
+
+            // Очистка и отрисовка города
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Рисуем красивую каменную брусчатку площади
+            ctx.strokeStyle = '#bfa280';
+            ctx.lineWidth = 1;
+            for(let i=0; i<canvas.width; i+=40) { ctx.beginPath(); ctx.moveTo(i,0); ctx.lineTo(i,canvas.height); ctx.stroke(); }
+            for(let j=0; j<canvas.height; j+=40) { ctx.beginPath(); ctx.moveTo(0,j); ctx.lineTo(canvas.width,j); ctx.stroke(); }
+
+            // Декоративный фонтан в центре города
+            ctx.fillStyle = '#757575';
+            ctx.beginPath(); ctx.arc(400, 300, 35, 0, Math.PI*2); ctx.fill(); ctx.stroke();
+            ctx.fillStyle = '#29b6f6';
+            ctx.beginPath(); ctx.arc(400, 300, 28, 0, Math.PI*2); ctx.fill();
+            ctx.fillStyle = '#9e9e9e';
+            ctx.beginPath(); ctx.arc(400, 300, 8, 0, Math.PI*2); ctx.fill();
+
+            // Рисуем все 4 объёмных дома
+            buildings.forEach(b => {
+                draw3DHouse(b.x, b.y, b.w, b.h, b.wallColor, b.roofColor, b.label);
+            });
+
+            // Рисуем игрока (Житель города)
+            ctx.fillStyle = player.color;
+            ctx.beginPath();
+            ctx.arc(player.x, player.y, 11, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.strokeStyle = '#fff';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            // Маленькая шляпа-треуголка игрока для атмосферы 18 века
+            ctx.fillStyle = '#212121';
+            ctx.fillRect(player.x - 10, player.y - 5, 20, 6);
+
+            requestAnimationFrame(loop);
+        }
+
+        function openQuest(b) {
+            for (let k in keys) keys[k] = false;
+            document.getElementById('q-title').innerText = b.title;
+            document.getElementById('q-text').innerText = b.info;
+            document.getElementById('q-question').innerText = b.question;
+            const ansDiv = document.getElementById('q-answers');
+            ansDiv.innerHTML = '';
+            b.answers.forEach((a, i) => {
+                const bBtn = document.createElement('button'); bBtn.className = 'ans-btn'; bBtn.innerText = a;
+                bBtn.onclick = () => { if (i === b.correct) { alert('🎉 Правильно!'); closeQuest(); } else { alert('❌ Попробуй еще раз!'); } };
+                ansDiv.appendChild(bBtn);
+            });
