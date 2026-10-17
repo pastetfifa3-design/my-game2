@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Европа XVIII века: Монументальный Научный Квест RPG</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body, html {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: #0c0805;
+            font-family: 'Georgia', Times, serif;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        #game-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        canvas {
+            display: block;
+            box-shadow: 0 0 60px rgba(0, 0, 0, 0.95);
+            background-color: #a4b3cc;
+        }
+        
+        /* Роскошный свиток с заданиями и историческими справками */
+        #ui-parchment {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(1);
+            width: 92%;
+            max-width: 680px;
+            background: #f7f1da;
+            color: #26170c;
+            padding: 40px;
+            border-radius: 6px;
+            border: 14px double #4a321a;
+            box-shadow: 0 25px 70px rgba(0,0,0,0.9);
+            text-align: center;
+            display: none;
+            z-index: 500;
+            background-image: radial-gradient(circle, #faf6eb 60%, #e6d4aa 100%);
+            animation: fadeInScroll 0.3s ease-out;
+        }
+        @keyframes fadeInScroll {
+            from { opacity: 0; transform: translate(-50%, -45%) scale(0.95); }
+            to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+        }
+        .scroll-title {
+            font-size: 28px;
+            font-weight: bold;
+            color: #4a2f13;
+            margin-bottom: 15px;
+            border-bottom: 3px double #8d6e63;
+            padding-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .scroll-text {
+            font-size: 16px;
+            line-height: 1.7;
+            text-align: justify;
+            margin-bottom: 25px;
+            max-height: 240px;
+            overflow-y: auto;
+            padding-right: 10px;
+            color: #3e2723;
+        }
+        .scroll-text::-webkit-scrollbar {
+            width: 6px;
+        }
+        .scroll-text::-webkit-scrollbar-thumb {
+            background: #8d6e63;
+            border-radius: 3px;
+        }
+        .quiz-container {
+            background: rgba(141, 110, 99, 0.08);
+            padding: 20px;
+            border-radius: 8px;
+            border: 2px dashed #a1887f;
+            margin-bottom: 25px;
+        }
+        .quiz-question {
+            font-size: 17px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #5d4037;
+        }
+        .choice-btn {
+            display: block;
+            width: 100%;
+            background: #9c7853;
+            color: #fffcf5;
+            border: 2px solid #5c3a21;
+            padding: 14px 20px;
+            margin: 12px 0;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 4px;
+            text-align: left;
+            transition: all 0.25s ease;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.15);
+        }
+        .choice-btn:hover {
+            background: #5c3a21;
+            color: #ffffff;
+            transform: translateX(8px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.25);
+        }
+        .close-btn {
+            background: #c62828;
+            color: white;
+            border: 2px solid #7f0000;
+            padding: 12px 28px;
+            font-size: 15px;
+            cursor: pointer;
+            border-radius: 4px;
+            font-weight: bold;
+            transition: background 0.2s;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+        }
+        .close-btn:hover {
+            background: #b71c1c;
+        }
+
+        /* Многофункциональный игровой интерфейс (HUD) */
+        #hud-dashboard {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(28, 18, 10, 0.94);
+            color: #fceade;
+            padding: 20px;
+            border-radius: 10px;
+            border: 3px solid #9c7853;
+            z-index: 100;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.75);
+            pointer-events: none;
+            width: 320px;
+        }
+        .hud-header {
+            font-size: 16px;
+            color: #ffb74d;
+            font-weight: bold;
+            border-bottom: 2px solid #9c7853;
+            padding-bottom: 8px;
+            margin-bottom: 12px;
+            letter-spacing: 0.5px;
+            text-align: center;
+        }
+        .journal-item {
+            font-size: 14px;
+            margin: 8px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .status-done {
+            background: #2e7d32;
+            color: #fff;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        .status-todo {
+            background: #c62828;
+            color: #fff;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        .stats-counter {
+            margin-top: 15px;
+            padding-top: 10px;
+            border-top: 1px dashed #5c3a21;
+            font-size: 13px;
+            color: #ffe0b2;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        /* Окно Окончания Исторической Миссии */
+        #victory-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(10, 6, 3, 0.97);
+            z-index: 999;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: #f7f1da;
+        }
+        .victory-title {
+            font-size: 48px;
+            color: #ffca28;
+            text-shadow: 0 0 25px rgba(255,202,40,0.6);
+            margin-bottom: 15px;
+            font-weight: bold;
+            text-align: center;
+            letter-spacing: 2px;
+        }
+        .victory-desc {
+            font-size: 21px;
+            max-width: 700px;
+            text-align: center;
+            line-height: 1.7;
+            color: #e0d4be;
+            margin-bottom: 40px;
+            padding: 0 20px;
+        }
+
+        /* Информационная плашка при запуске */
+        #start-click-prompt {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: #d84315;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 5px;
+            font-weight: bold;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.4);
+            animation: pulseText 1.6s infinite;
+            z-index: 200;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        @keyframes pulseText {
+            0% { opacity: 0.7; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.03); }
+            100% { opacity: 0.7; transform: scale(1); }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="game-container">
+        <!-- Кнопка-подсказка -->
+        <div id="start-click-prompt" onclick="activateControls()">КЛИКНИТЕ ДЛЯ АКТИВАЦИИ КЛАВИАТУРЫ 🖱️</div>
+
+        <!-- HUD Панель -->
+        <div id="hud-dashboard">
+            <div class="hud-header">📜 ХРОНИКИ НАУКИ: XVIII ВЕК</div>
+            <div id="j-newton" class="journal-item">
+                <span>1. Спектр Исаака Ньютона</span>
+                <span class="status-todo">В поиске</span>
+            </div>
+            <div id="j-franklin" class="journal-item">
+                <span>2. Атмосферный змей Франклина</span>
+                <span class="status-todo">В поиске</span>
+            </div>
+            <div id="j-montgolfier" class="journal-item">
+                <span>3. Воздушный шар Монгольфье</span>
+                <span class="status-todo">В поиске</span>
+            </div>
+            <div id="j-lavoisier" class="journal-item">
+                <span>4. Кислород Антуана Лавуазье</span>
+                <span class="status-todo">В поиске</span>
+            </div>
+            <div class="stats-counter">
+                <span>Пройдено шагов: <strong id="step-count">0</strong></span>
+                <span>Погода: <strong id="weather-status" style="color: #64b5f6;">Ясно</strong></span>
+            </div>
+        </div>
+
+        <!-- Основной холст рендеринга -->
+        <canvas id="mainGameCanvas"></canvas>
+
+        <!-- Свиток квестов -->
+        <div id="ui-parchment">
+            <div id="s-title" class="scroll-title">Название Академии</div>
+            <div id="s-text" class="scroll-text">Историческое описание...</div>
+            <div class="quiz-container">
+                <div id="s-question" class="quiz-question">Экзаменационный вопрос...</div>
+                <div id="s-choices"></div>
+            </div>
+            <button class="close-btn" onclick="closeParchmentUI()">Вернуться в город ❌</button>
+        </div>
+
+        <!-- Экран триумфа -->
+        <div id="victory-screen">
+            <div class="victory-title">📜 ЭПОХА ПРОСВЕЩЕНИЯ ПОКОРЕНА!</div>
+            <p class="victory-desc">Вы успешно собрали данные обо всех фундаментальных открытиях восемнадцатого столетия. Ваша исследовательская работа внесена в летопись мировой истории науки!</p>
