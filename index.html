@@ -1,247 +1,60 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Европа XVIII века: Город Науки</title>
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            background-color: #2c1d11;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            overflow: hidden;
-        }
-        #game-container {
-            position: relative;
-            width: 800px;
-            height: 600px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.7);
-            border: 4px solid #8d6e63;
-            border-radius: 8px;
-        }
-        canvas {
-            background-color: #dfd3c3; /* Цвет брусчатки площади */
-            display: block;
-        }
-        /* Окно интерфейса станций */
-        #ui-box {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 80%;
-            max-width: 500px;
-            background: #f5ebe0;
-            color: #3e2723;
-            padding: 25px;
-            border-radius: 12px;
-            border: 3px solid #5d4037;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-            text-align: center;
-            display: none;
-            z-index: 10;
-        }
-        .ui-btn {
-            background-color: #8d6e63;
-            color: white;
-            border: none;
-            padding: 12px 20px;
-            margin: 8px 5px;
-            cursor: pointer;
-            font-size: 15px;
-            border-radius: 6px;
-            transition: background 0.2s;
-        }
-        .ui-btn:hover { background-color: #5d4037; }
-        #instructions {
-            position: absolute;
-            top: 15px;
-            left: 15px;
-            background: rgba(44, 29, 17, 0.85);
-            color: #f5ebe0;
-            padding: 12px;
-            border-radius: 6px;
-            font-size: 14px;
-            pointer-events: none;
-            border: 1px solid #8d6e63;
-        }
-    </style>
-</head>
-<body>
+        function loop() {
+            if (ui.style.display !== 'block') {
+                if (keys['w'] || keys['arrowup']) player.y -= player.speed;
+                if (keys['s'] || keys['arrowdown']) player.y += player.speed;
+                if (keys['a'] || keys['arrowleft']) player.x -= player.speed;
+                if (keys['d'] || keys['arrowright']) player.x += player.speed;
 
-    <div id="game-container">
-        <!-- Подсказка управления -->
-        <div id="instructions">
-            <strong>📜 Научный Квест (XVIII век)</strong><br>
-            • Ходить: WASD / Стрелочки<br>
-            • Задача: Посети все 4 цветные станции науки!
-        </div>
+                if (player.x < 0) player.x = 0;
+                if (player.x > canvas.width - player.size) player.x = canvas.width - player.size;
+                if (player.y < 0) player.y = 0;
+                if (player.y > canvas.height - player.size) player.y = canvas.height - player.size;
 
-        <!-- Игровое поле -->
-        <canvas id="gameCanvas" width="800" height="600"></canvas>
-
-        <!-- Всплывающий диалог станции -->
-        <div id="ui-box">
-            <h2 id="title">Станция</h2>
-            <p id="info">Описание открытия...</p>
-            <p><strong id="question">Вопрос...</strong></p>
-            <div id="options"></div>
-            <button class="ui-btn" style="background-color: #c62828;" onclick="closeUI()">Закрыть ❌</button>
-        </div>
-    </div>
-
-    <script>
-        const canvas = document.getElementById('gameCanvas');
-        const ctx = canvas.getContext('2d');
-        const uiBox = document.getElementById('ui-box');
-
-        // Параметры игрока
-        const player = {
-            x: 400,
-            y: 300,
-            size: 20,
-            speed: 4,
-            color: '#1e88e5' // Синий аватар игрока
-        };
-
-        // Направления движения
-        const keys = { w: false, a: false, s: false, d: false, ArrowUp: false, ArrowDown: false, ArrowLeft: false, ArrowRight: false };
-
-        // 4 Станции науки (Здания)
-        const stations = [
-            {
-                id: 1, x: 120, y: 120, size: 70, color: '#4caf50', name: "Ньютон",
-                title: "🏛️ Станция 1: Исаак Ньютон",
-                info: "В начале XVIII века оптика развивалась благодаря Исааку Ньютону. Он создал зеркальный телескоп и объяснил природу света, разложив его на цвета радуги с помощью стеклянной призмы.",
-                question: "Какое явление продемонстрировал Ньютон, пропустив белый свет через призму?",
-                answers: ["Дифракция", "Дисперсия (распад на спектр)", "Поглощение"],
-                correct: 1
-            },
-            {
-                id: 2, x: 610, y: 120, size: 70, color: '#2196f3', name: "Франклин",
-                title: "⚡ Станция 2: Бенджамин Франклин",
-                info: "В 1752 году Франклин провел эксперимент с воздушным змеем во время грозы, доказав электрическую природу молнии, и создал первый эффективный громоотвод.",
-                question: "Что изобрел Франклин для защиты зданий от разрушительных ударов молний?",
-                answers: ["Громоотвод", "Электрическую батарею", "Трансформатор"],
-                correct: 0
-            },
-            {
-                id: 3, x: 120, y: 410, size: 70, color: '#ff9800', name: "Монгольфье",
-                title: "🎈 Станция 3: Братья Монгольфье",
-                info: "В 1783 году во Франции Жозеф-Мишель и Жак-Этьенн Монгольфье запустили первый в мире воздушный шар, открыв эпоху воздухоплавания.",
-                question: "Чем наполнили первый летающий шар братья Монгольфье?",
-                answers: ["Водородом", "Горячим воздухом и дымом", "Гелием"],
-                correct: 1
-            },
-            {
-                id: 4, x: 610, y: 410, size: 70, color: '#e91e63', name: "Лавуазье",
-                title: "🧪 Станция 4: Антуан Лавуазье",
-                info: "Антуан Лавуазье устроил революцию в химии: он окончательно опроверг старую алхимическую теорию флогистона и доказал роль кислорода в горении.",
-                question: "Какую устаревшую концепцию горения Лавуазье стёр из науки своими точными опытами?",
-                answers: ["Теорию флогистона", "Теорию эфира", "Теорию атомов"],
-                correct: 0
+                places.forEach(p => {
+                    if (player.x < p.x + p.size && player.x + player.size > p.x && player.y < p.y + p.size && player.y + player.size > p.y) {
+                        openQuest(p);
+                    }
+                });
             }
-        ];
 
-        // Слушатели клавиатуры
-        window.addEventListener('keydown', e => { if (e.key in keys || ['w','a','s','d'].includes(e.key.toLowerCase())) keys[e.key.toLowerCase() || e.key] = true; });
-        window.addEventListener('keyup', e => { if (e.key in keys || ['w','a','s','d'].includes(e.key.toLowerCase())) keys[e.key.toLowerCase() || e.key] = false; });
-
-        function update() {
-            // Если открыто окно, игровой процесс останавливается
-            if (uiBox.style.display === "block") return;
-
-            // Движение игрока
-            if (keys.w || keys.arrowup) player.y -= player.speed;
-            if (keys.s || keys.arrowdown) player.y += player.speed;
-            if (keys.a || keys.arrowleft) player.x -= player.speed;
-            if (keys.d || keys.arrowright) player.x += player.speed;
-
-            // Ограничение игрока границами экрана
-            if (player.x < 0) player.x = 0;
-            if (player.x > canvas.width - player.size) player.x = canvas.width - player.size;
-            if (player.y < 0) player.y = 0;
-            if (player.y > canvas.height - player.size) player.y = canvas.height - player.size;
-
-            // Проверка столкновений со станциями
-            stations.forEach(station => {
-                if (player.x < station.x + station.size &&
-                    player.x + player.size > station.x &&
-                    player.y < station.y + station.size &&
-                    player.y + player.size > station.y) {
-                        openUI(station);
-                }
-            });
-        }
-
-        function openUI(station) {
-            document.getElementById('title').innerText = station.title;
-            document.getElementById('info').innerText = station.info;
-            document.getElementById('question').innerText = "Задание: " + station.question;
-
-            const optionsDiv = document.getElementById('options');
-            optionsDiv.innerHTML = "";
-
-            station.answers.forEach((answer, index) => {
-                const btn = document.createElement('button');
-                btn.className = "ui-btn";
-                btn.innerText = answer;
-                btn.onclick = () => checkAnswer(index, station.correct);
-                optionsDiv.appendChild(btn);
-            });
-
-            uiBox.style.display = "block";
-        }
-
-        function checkAnswer(selected, correct) {
-            if (selected === correct) {
-                alert("🎉 Потрясающе! Ответ верный, открытие усвоено.");
-                closeUI();
-            } else {
-                alert("❌ Ошибка! Прочти историческую заметку ещё раз.");
-            }
-        }
-
-        function closeUI() {
-            uiBox.style.display = "none";
-            // Отталкиваем игрока в центр, чтобы окно не открывалось повторно на месте
-            player.x = 400;
-            player.y = 300;
-        }
-
-        function draw() {
-            // Очистка экрана
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            // Рисуем сетку «европейской брусчатки»
-            ctx.strokeStyle = '#d3c4b1';
-            ctx.lineWidth = 1;
-            for(let i=0; i<canvas.width; i+=40) {
-                ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i, canvas.height); ctx.stroke();
-            }
-            for(let j=0; j<canvas.height; j+=40) {
-                ctx.beginPath(); ctx.moveTo(0, j); ctx.lineTo(canvas.width, j); ctx.stroke();
-            }
+            // Брусчатка площади
+            ctx.strokeStyle = '#cdbca6';
+            for(let i=0; i<canvas.width; i+=50) { ctx.beginPath(); ctx.moveTo(i,0); ctx.lineTo(i,canvas.height); ctx.stroke(); }
+            for(let j=0; j<canvas.height; j+=50) { ctx.beginPath(); ctx.moveTo(0,j); ctx.lineTo(canvas.width,j); ctx.stroke(); }
 
-            // Рисуем станции науки (здания)
-            stations.forEach(station => {
-                ctx.fillStyle = station.color;
-                ctx.fillRect(station.x, station.y, station.size, station.size);
-                ctx.lineWidth = 3;
-                ctx.strokeStyle = '#3e2723';
-                ctx.strokeRect(station.x, station.y, station.size, station.size);
-
-                // Подпись здания
-                ctx.fillStyle = '#3e2723';
-                ctx.font = 'bold 14px Arial';
-                ctx.fillText(station.name, station.x + 5, station.y - 8);
+            // Здания-станции
+            places.forEach(p => {
+                ctx.fillStyle = p.color; ctx.fillRect(p.x, p.y, p.size, p.size);
+                ctx.strokeStyle = '#2b1a0e'; ctx.lineWidth = 3; ctx.strokeRect(p.x, p.y, p.size, p.size);
+                ctx.fillStyle = '#2b1a0e'; ctx.font = 'bold 14px sans-serif'; ctx.fillText(p.label, p.x + 5, p.y - 10);
             });
 
-            // Рисуем игрока
-            ctx.fillStyle = player.color;
-            ctx.fillRect(player.x, player.y, player.size, player.size);
+            // Персонаж
+            ctx.fillStyle = player.color; ctx.fillRect(player.x, player.y, player.size, player.size);
+            ctx.strokeStyle = '#01579b'; ctx.strokeRect(player.x, player.y, player.size, player.size);
+
+            requestAnimationFrame(loop);
+        }
+
+        function openQuest(p) {
+            document.getElementById('q-title').innerText = p.title;
+            document.getElementById('q-text').innerText = p.info;
+            document.getElementById('q-question').innerText = p.question;
+            const ansDiv = document.getElementById('q-answers');
+            ansDiv.innerHTML = '';
+            p.answers.forEach((a, i) => {
+                const b = document.createElement('button'); b.className = 'ans-btn'; b.innerText = a;
+                b.onclick = () => { if (i === p.correct) { alert('🎉 Верно!'); closeQuest(); } else { alert('❌ Попробуй еще раз!'); } };
+                ansDiv.appendChild(b);
+            });
+            ui.style.display = 'block';
+        }
+
+        function closeQuest() { ui.style.display = 'none'; player.x = 400; player.y = 300; }
+
+        // Инициализация только после полной загрузки окна, чтобы графика не пропадала
+        window.onload = function() {
+            loop();
+        };
