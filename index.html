@@ -4,7 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Европа XVIII века: Город Науки</title>
+    <!-- Подключаем стабильный 3D-движок с правильной инициализацией -->
+    <script src="https://aframe.io"></script>
     <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: #b5c6e0; /* Фон на случай долгой загрузки */
+        }
         /* Стили для интерфейса поверх 3D-сцены */
         #ui-container {
             position: absolute;
@@ -13,7 +20,7 @@
             transform: translateX(-50%);
             width: 80%;
             max-width: 600px;
-            background: rgba(44, 34, 24, 0.9);
+            background: rgba(44, 34, 24, 0.95);
             color: #f5ebe0;
             padding: 20px;
             border-radius: 10px;
@@ -22,7 +29,7 @@
             text-align: center;
             box-shadow: 0 5px 15px rgba(0,0,0,0.5);
             display: none; /* Изначально скрыто */
-            z-index: 10;
+            z-index: 999;
         }
         .ui-btn {
             background-color: #8d6e63;
@@ -45,7 +52,7 @@
             font-family: sans-serif;
             border-radius: 5px;
             pointer-events: none;
-            z-index: 10;
+            z-index: 999;
         }
     </style>
 </head>
@@ -55,8 +62,8 @@
     <div id="instructions">
         <strong>Управление:</strong><br>
         • Ходить: WASD или Стрелочки<br>
-        • Осмотреться: Мышка (зажми и тяни)<br>
-        • Подойди к светящимся колоннам!
+        • Осмотреться: Мышка (зажми левую кнопку и тяни)<br>
+        • Подойди вплотную к цветным колоннам!
     </div>
 
     <!-- Интерфейс станций (задания и инфо) -->
@@ -67,17 +74,13 @@
             <p id="station-question"><strong>Задание:</strong> Вопрос...</p>
             <div id="answers-options"></div>
         </div>
-        <button class="ui-btn" onclick="closeUI()">Закрыть ❌</button>
+        <button class="ui-btn" style="background-color: #c62828;" onclick="closeUI()">Закрыть ❌</button>
     </div>
 
     <!-- 3D СЦЕНА -->
-    <a-scene embedded style="width: 100vw; height: 100vh;">
+    <a-scene renderer="antialias: true; colorManagement: true;">
         <!-- Небо -->
         <a-sky color="#b5c6e0"></a-sky>
-
-        <!-- Свет -->
-        
-        
 
         <!-- Земля (городская площадь) -->
         <a-plane position="0 0 0" rotation="-90 0 0" width="100" height="100" color="#7d7367"></a-plane>
@@ -101,71 +104,64 @@
 
         <!-- Станция 1: Исаак Ньютон (Оптика/Гравитация) -->
         
-            <a-cylinder radius="0.8" height="3" color="#4caf50" opacity="0.7"></a-cylinder>
+            <a-cylinder radius="1" height="4" color="#4caf50" opacity="0.6"></a-cylinder>
             <a-box position="0 1.5 0" width="0.5" height="0.5" depth="0.5" color="#fff" animation="property: rotation; to: 0 360 0; loop: true; dur: 4000"></a-box>
-            <a-text value="1. Newton" align="center" position="0 3.5 0" scale="1.5 1.5 1.5" color="#000"></a-text>
         
 
         <!-- Станция 2: Бенджамин Франклин (Электричество) -->
         
-            <a-cylinder radius="0.8" height="3" color="#2196f3" opacity="0.7"></a-cylinder>
+            <a-cylinder radius="1" height="4" color="#2196f3" opacity="0.6"></a-cylinder>
             <a-box position="0 1.5 0" width="0.5" height="0.5" depth="0.5" color="#fff" animation="property: rotation; to: 0 360 0; loop: true; dur: 4000"></a-box>
-            <a-text value="2. Franklin" align="center" position="0 3.5 0" scale="1.5 1.5 1.5" color="#000"></a-text>
         
 
         <!-- Станция 3: Братья Монгольфье (Воздушный шар) -->
         
-            <a-cylinder radius="0.8" height="3" color="#ff9800" opacity="0.7"></a-cylinder>
+            <a-cylinder radius="1" height="4" color="#ff9800" opacity="0.6"></a-cylinder>
             <a-box position="0 1.5 0" width="0.5" height="0.5" depth="0.5" color="#fff" animation="property: rotation; to: 0 360 0; loop: true; dur: 4000"></a-box>
-            <a-text value="3. Montgolfier" align="center" position="0 3.5 0" scale="1.5 1.5 1.5" color="#000"></a-text>
         
 
-        <!-- Станция 4: Антуан Лавуазье (Химия/Кислород) -->
+        <!-- Станция 4: ... (Химия/Кислород) -->
         
-            <a-cylinder radius="0.8" height="3" color="#e91e63" opacity="0.7"></a-cylinder>
+            <a-cylinder radius="1" height="4" color="#e91e63" opacity="0.6"></a-cylinder>
             <a-box position="0 1.5 0" width="0.5" height="0.5" depth="0.5" color="#fff" animation="property: rotation; to: 0 360 0; loop: true; dur: 4000"></a-box>
-            <a-text value="4. Lavoisier" align="center" position="0 3.5 0" scale="1.5 1.5 1.5" color="#000"></a-text>
         
 
     </a-scene>
-
-    <!-- Подключаем 3D движок в конце документа -->
-    <script src="https://aframe.io"></script>
 
     <!-- Логика работы станций -->
     <script>
         const stations = [
             {
-                x: -10, z: -5, radius: 2.5,
+                x: -10, z: -5, radius: 3,
                 title: "🏛️ Станция 1: Исаак Ньютон",
-                info: "В начале XVIII века оптика и физика развивались благодаря Ньютону. Он создал телескоп-рефлектор и объяснил природу света, разложив его на цвета радуги с помощью призмы.",
+                info: "В начале XVIII века оптика и физика активно развивались на базе открытий Ньютона. Он создал зеркальный телескоп и объяснил природу света, разложив его на цвета радуги с помощью призмы.",
                 question: "Какое явление продемонстрировал Ньютон, пропустив белый свет через призму?",
-                answers: ["Дифракция", "Дисперсия (распад на цвета)", "Поглощение"],
+                answers: ["Дифракция", "Дисперсия (распад на спектр)", "Поглощение"],
                 correct: 1
             },
             {
-                x: 10, z: -5, radius: 2.5,
+                x: 10, z: -5, radius: 3,
                 title: "⚡ Станция 2: Бенджамин Франклин",
-                info: "В 1752 году Франклин провел знаменитый эксперимент с воздушным змеем во время грозы, доказав, что молния — это электричество, и изобрел громоотвод.",
-                question: "Что изобрел Франклин для защиты зданий от молний?",
-                answers: ["Громоотвод", "Электрический стул", "Батарейку"],
+                info: "В 1752 году Франклин провел знаменитый эксперимент с воздушным змеем во время грозы, доказав, что молния — это сильный электрический разряд.",
+                question: "Что изобрел Франклин для защиты зданий от ударов молний?",
+                answers: ["Громоотвод", "Электрический провод", "Конденсатор"],
                 correct: 0
             },
             {
-                x: -10, z: 5, radius: 2.5,
+                x: -10, z: 5, radius: 3,
                 title: "🎈 Станция 3: Братья Монгольфье",
-                info: "В 1783 году во Франции братья Монгольфье совершили первый в истории полет человека на воздушном шаре, надутом горячим воздухом.",
-                question: "Каким газом (веществом) был наполнен первый шар братьев Монгольфье?",
-                answers: ["Водород", "Горячий дым/воздух", "Гелий"],
+                info: "В 1783 году во Франции братья Монгольфье совершили грандиозный прорыв — первый в истории полет человека на воздушном шаре.",
+                question: "Чем был наполнен первый шар братьев Монгольфье для создания подъемной силы?",
+                answers: ["Водородом", "Горячим дымом и воздухом", "Углекислым газом"],
                 correct: 1
             },
             {
-                x: 10, z: 5, radius: 2.5,
+                x: 10, z: 5, radius: 3,
                 title: "🧪 Станция 4: Антуан Лавуазье",
-                info: "Лавуазье опроверг теорию флогистона, доказал роль кислорода в горении и дыхании, а также стал одним из создателей современной химии.",
-                question: "Какой важный химический элемент Лавуазье детально описал и назвал 'рождающим кислоту'?",
-                answers: ["Азот", "Углерод", "Кислород"],
-                correct: 2
+                info: "Лавуазье совершил революцию в химии: он окончательно доказал роль кислорода в процессах горения, окисления и дыхания.",
+                question: "Какую устаревшую теорию горения полностью опроверг Лавуазье своими опытами?",
+                answers: ["Теорию флогистона", "Теорию эфира", "Теорию атомизма"],
+                correct: 0
             }
         ];
 
@@ -215,14 +211,484 @@
 
         function checkAnswer(selectedIndex, correctIndex) {
             if (selectedIndex === correctIndex) {
-                alert("🎉 Правильно! Открытие усвоено.");
+                alert("🎉 Правильно! Историческое открытие успешно изучено.");
                 closeUI();
             } else {
-                alert("❌ Неверно. Прочитай описание внимательнее и попробуй еще раз!");
+                alert("❌ Неверно. Прочитай справку внимательнее и попробуй ещё раз!");
             }
         }
 
         function closeUI() {
             ui.style.display = "none";
+            // Немного сдвигаем игрока назад, чтобы окно не открывалось бесконечно, пока он стоит на месте
+            if (player) {
+                const pos = player.getAttribute('position');
+                player.setAttribute('position', {x: pos.x, y: pos.y, z: pos.z + 1});
+            }
         }
 
+        // Запуск проверки с небольшим интервалом после полной загрузки страницы
+        window.addEventListener('load', () => {
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Европа XVIII века: Город Науки</title>
+    <!-- Подключаем стабильный 3D-движок с правильной инициализацией -->
+    <script src="https://aframe.io"></script>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: #b5c6e0; /* Фон на случай долгой загрузки */
+        }
+        /* Стили для интерфейса поверх 3D-сцены */
+        #ui-container {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80%;
+            max-width: 600px;
+            background: rgba(44, 34, 24, 0.95);
+            color: #f5ebe0;
+            padding: 20px;
+            border-radius: 10px;
+            border: 3px solid #8d6e63;
+            font-family: sans-serif;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+            display: none; /* Изначально скрыто */
+            z-index: 999;
+        }
+        .ui-btn {
+            background-color: #8d6e63;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 10px 5px 0 5px;
+            cursor: pointer;
+            font-size: 16px;
+            border-radius: 5px;
+        }
+        .ui-btn:hover { background-color: #a1887f; }
+        #instructions {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 10px;
+            font-family: sans-serif;
+            border-radius: 5px;
+            pointer-events: none;
+            z-index: 999;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Инструкция для игрока -->
+    <div id="instructions">
+        <strong>Управление:</strong><br>
+        • Ходить: WASD или Стрелочки<br>
+        • Осмотреться: Мышка (зажми левую кнопку и тяни)<br>
+        • Подойди вплотную к цветным колоннам!
+    </div>
+
+    <!-- Интерфейс станций (задания и инфо) -->
+    <div id="ui-container">
+        <h2 id="station-title">Название станции</h2>
+        <p id="station-info">Информация об открытии...</p>
+        <div id="quiz-zone">
+            <p id="station-question"><strong>Задание:</strong> Вопрос...</p>
+            <div id="answers-options"></div>
+        </div>
+        <button class="ui-btn" style="background-color: #c62828;" onclick="closeUI()">Закрыть ❌</button>
+    </div>
+
+    <!-- 3D СЦЕНА -->
+    <a-scene renderer="antialias: true; colorManagement: true;">
+        <!-- Небо -->
+        <a-sky color="#b5c6e0"></a-sky>
+
+        <!-- Земля (городская площадь) -->
+        <a-plane position="0 0 0" rotation="-90 0 0" width="100" height="100" color="#7d7367"></a-plane>
+
+        <!-- Окружение: Стены города/здания -->
+        <a-box position="0 5 -30" width="60" height="10" depth="2" color="#5c5346"></a-box>
+        <a-box position="-30 5 0" width="2" height="10" depth="60" color="#5c5346"></a-box>
+        <a-box position="30 5 0" width="2" height="10" depth="60" color="#5c5346"></a-box>
+        
+        <!-- Декорации: Старинные дома -->
+        <a-box position="-15 6 -20" width="10" height="12" depth="10" color="#8b7355"></a-box>
+        <a-box position="15 6 -20" width="10" height="12" depth="10" color="#a08060"></a-box>
+        <a-box position="-20 5 10" width="8" height="10" depth="12" color="#6b5b45"></a-box>
+
+        <!-- Камера игрока -->
+        
+            <a-cursor color="#ff0000" width="0.02"></a-cursor>
+        
+
+        <!-- ================= СТАНЦИИ НАУКИ ================= -->
+
+        <!-- Станция 1: Исаак Ньютон (Оптика/Гравитация) -->
+        
+            <a-cylinder radius="1" height="4" color="#4caf50" opacity="0.6"></a-cylinder>
+            <a-box position="0 1.5 0" width="0.5" height="0.5" depth="0.5" color="#fff" animation="property: rotation; to: 0 360 0; loop: true; dur: 4000"></a-box>
+        
+
+        <!-- Станция 2: Бенджамин Франклин (Электричество) -->
+        
+            <a-cylinder radius="1" height="4" color="#2196f3" opacity="0.6"></a-cylinder>
+            <a-box position="0 1.5 0" width="0.5" height="0.5" depth="0.5" color="#fff" animation="property: rotation; to: 0 360 0; loop: true; dur: 4000"></a-box>
+        
+
+        <!-- Станция 3: Братья Монгольфье (Воздушный шар) -->
+        
+            <a-cylinder radius="1" height="4" color="#ff9800" opacity="0.6"></a-cylinder>
+            <a-box position="0 1.5 0" width="0.5" height="0.5" depth="0.5" color="#fff" animation="property: rotation; to: 0 360 0; loop: true; dur: 4000"></a-box>
+        
+
+        <!-- Станция 4: ... (Химия/Кислород) -->
+        
+            <a-cylinder radius="1" height="4" color="#e91e63" opacity="0.6"></a-cylinder>
+            <a-box position="0 1.5 0" width="0.5" height="0.5" depth="0.5" color="#fff" animation="property: rotation; to: 0 360 0; loop: true; dur: 4000"></a-box>
+        
+
+    </a-scene>
+
+    <!-- Логика работы станций -->
+    <script>
+        const stations = [
+            {
+                x: -10, z: -5, radius: 3,
+                title: "🏛️ Станция 1: Исаак Ньютон",
+                info: "В начале XVIII века оптика и физика активно развивались на базе открытий Ньютона. Он создал зеркальный телескоп и объяснил природу света, разложив его на цвета радуги с помощью призмы.",
+                question: "Какое явление продемонстрировал Ньютон, пропустив белый свет через призму?",
+                answers: ["Дифракция", "Дисперсия (распад на спектр)", "Поглощение"],
+                correct: 1
+            },
+            {
+                x: 10, z: -5, radius: 3,
+                title: "⚡ Станция 2: Бенджамин Франклин",
+                info: "В 1752 году Франклин провел знаменитый эксперимент с воздушным змеем во время грозы, доказав, что молния — это сильный электрический разряд.",
+                question: "Что изобрел Франклин для защиты зданий от ударов молний?",
+                answers: ["Громоотвод", "Электрический провод", "Конденсатор"],
+                correct: 0
+            },
+            {
+                x: -10, z: 5, radius: 3,
+                title: "🎈 Станция 3: Братья Монгольфье",
+                info: "В 1783 году во Франции братья Монгольфье совершили грандиозный прорыв — первый в истории полет человека на воздушном шаре.",
+                question: "Чем был наполнен первый шар братьев Монгольфье для создания подъемной силы?",
+                answers: ["Водородом", "Горячим дымом и воздухом", "Углекислым газом"],
+                correct: 1
+            },
+            {
+                x: 10, z: 5, radius: 3,
+                title: "🧪 Станция 4: Антуан Лавуазье",
+                info: "Лавуазье совершил революцию в химии: он окончательно доказал роль кислорода в процессах горения, окисления и дыхания.",
+                question: "Какую устаревшую теорию горения полностью опроверг Лавуазье своими опытами?",
+                answers: ["Теорию флогистона", "Теорию эфира", "Теорию атомизма"],
+                correct: 0
+            }
+        ];
+
+        const player = document.getElementById('player');
+        const ui = document.getElementById('ui-container');
+        let activeStation = null;
+
+        function checkPlayerPosition() {
+            if (!player) return;
+            const pos = player.getAttribute('position');
+            if (!pos || ui.style.display === "block") return;
+
+            let insideAnyStation = false;
+
+            stations.forEach((station) => {
+                let distance = Math.sqrt(Math.pow(pos.x - station.x, 2) + Math.pow(pos.z - station.z, 2));
+                if (distance < station.radius) {
+                    insideAnyStation = true;
+                    if (activeStation !== station) {
+                        openStationUI(station);
+                    }
+                }
+            });
+
+            if (!insideAnyStation) activeStation = null;
+        }
+
+        function openStationUI(station) {
+            activeStation = station;
+            document.getElementById('station-title').innerText = station.title;
+            document.getElementById('station-info').innerText = station.info;
+            document.getElementById('station-question').innerText = "Задание: " + station.question;
+            
+            const answersDiv = document.getElementById('answers-options');
+            answersDiv.innerHTML = "";
+
+            station.answers.forEach((answer, index) => {
+                const btn = document.createElement('button');
+                btn.className = "ui-btn";
+                btn.innerText = answer;
+                btn.onclick = () => checkAnswer(index, station.correct);
+                answersDiv.appendChild(btn);
+            });
+
+            ui.style.display = "block";
+        }
+
+        function checkAnswer(selectedIndex, correctIndex) {
+            if (selectedIndex === correctIndex) {
+                alert("🎉 Правильно! Историческое открытие успешно изучено.");
+                closeUI();
+            } else {
+                alert("❌ Неверно. Прочитай справку внимательнее и попробуй ещё раз!");
+            }
+        }
+
+        function closeUI() {
+            ui.style.display = "none";
+            // Немного сдвигаем игрока назад, чтобы окно не открывалось бесконечно, пока он стоит на месте
+            if (player) {
+                const pos = player.getAttribute('position');
+                player.setAttribute('position', {x: pos.x, y: pos.y, z: pos.z + 1});
+            }
+        }
+
+        // Запуск проверки с небольшим интервалом после полной загрузки страницы
+        window.addEventListener('load', () => {
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Европа XVIII века: Город Науки</title>
+    <!-- Подключаем стабильный 3D-движок с правильной инициализацией -->
+    <script src="https://aframe.io"></script>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: #b5c6e0; /* Фон на случай долгой загрузки */
+        }
+        /* Стили для интерфейса поверх 3D-сцены */
+        #ui-container {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80%;
+            max-width: 600px;
+            background: rgba(44, 34, 24, 0.95);
+            color: #f5ebe0;
+            padding: 20px;
+            border-radius: 10px;
+            border: 3px solid #8d6e63;
+            font-family: sans-serif;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+            display: none; /* Изначально скрыто */
+            z-index: 999;
+        }
+        .ui-btn {
+            background-color: #8d6e63;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 10px 5px 0 5px;
+            cursor: pointer;
+            font-size: 16px;
+            border-radius: 5px;
+        }
+        .ui-btn:hover { background-color: #a1887f; }
+        #instructions {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 10px;
+            font-family: sans-serif;
+            border-radius: 5px;
+            pointer-events: none;
+            z-index: 999;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Инструкция для игрока -->
+    <div id="instructions">
+        <strong>Управление:</strong><br>
+        • Ходить: WASD или Стрелочки<br>
+        • Осмотреться: Мышка (зажми левую кнопку и тяни)<br>
+        • Подойди вплотную к цветным колоннам!
+    </div>
+
+    <!-- Интерфейс станций (задания и инфо) -->
+    <div id="ui-container">
+        <h2 id="station-title">Название станции</h2>
+        <p id="station-info">Информация об открытии...</p>
+        <div id="quiz-zone">
+            <p id="station-question"><strong>Задание:</strong> Вопрос...</p>
+            <div id="answers-options"></div>
+        </div>
+        <button class="ui-btn" style="background-color: #c62828;" onclick="closeUI()">Закрыть ❌</button>
+    </div>
+
+    <!-- 3D СЦЕНА -->
+    <a-scene renderer="antialias: true; colorManagement: true;">
+        <!-- Небо -->
+        <a-sky color="#b5c6e0"></a-sky>
+
+        <!-- Земля (городская площадь) -->
+        <a-plane position="0 0 0" rotation="-90 0 0" width="100" height="100" color="#7d7367"></a-plane>
+
+        <!-- Окружение: Стены города/здания -->
+        <a-box position="0 5 -30" width="60" height="10" depth="2" color="#5c5346"></a-box>
+        <a-box position="-30 5 0" width="2" height="10" depth="60" color="#5c5346"></a-box>
+        <a-box position="30 5 0" width="2" height="10" depth="60" color="#5c5346"></a-box>
+        
+        <!-- Декорации: Старинные дома -->
+        <a-box position="-15 6 -20" width="10" height="12" depth="10" color="#8b7355"></a-box>
+        <a-box position="15 6 -20" width="10" height="12" depth="10" color="#a08060"></a-box>
+        <a-box position="-20 5 10" width="8" height="10" depth="12" color="#6b5b45"></a-box>
+
+        <!-- Камера игрока -->
+        
+            <a-cursor color="#ff0000" width="0.02"></a-cursor>
+        
+
+        <!-- ================= СТАНЦИИ НАУКИ ================= -->
+
+        <!-- Станция 1: Исаак Ньютон (Оптика/Гравитация) -->
+        
+            <a-cylinder radius="1" height="4" color="#4caf50" opacity="0.6"></a-cylinder>
+            <a-box position="0 1.5 0" width="0.5" height="0.5" depth="0.5" color="#fff" animation="property: rotation; to: 0 360 0; loop: true; dur: 4000"></a-box>
+        
+
+        <!-- Станция 2: Бенджамин Франклин (Электричество) -->
+        
+            <a-cylinder radius="1" height="4" color="#2196f3" opacity="0.6"></a-cylinder>
+            <a-box position="0 1.5 0" width="0.5" height="0.5" depth="0.5" color="#fff" animation="property: rotation; to: 0 360 0; loop: true; dur: 4000"></a-box>
+        
+
+        <!-- Станция 3: Братья Монгольфье (Воздушный шар) -->
+        
+            <a-cylinder radius="1" height="4" color="#ff9800" opacity="0.6"></a-cylinder>
+            <a-box position="0 1.5 0" width="0.5" height="0.5" depth="0.5" color="#fff" animation="property: rotation; to: 0 360 0; loop: true; dur: 4000"></a-box>
+        
+
+        <!-- Станция 4: ... (Химия/Кислород) -->
+        
+            <a-cylinder radius="1" height="4" color="#e91e63" opacity="0.6"></a-cylinder>
+            <a-box position="0 1.5 0" width="0.5" height="0.5" depth="0.5" color="#fff" animation="property: rotation; to: 0 360 0; loop: true; dur: 4000"></a-box>
+        
+
+    </a-scene>
+
+    <!-- Логика работы станций -->
+    <script>
+        const stations = [
+            {
+                x: -10, z: -5, radius: 3,
+                title: "🏛️ Станция 1: Исаак Ньютон",
+                info: "В начале XVIII века оптика и физика активно развивались на базе открытий Ньютона. Он создал зеркальный телескоп и объяснил природу света, разложив его на цвета радуги с помощью призмы.",
+                question: "Какое явление продемонстрировал Ньютон, пропустив белый свет через призму?",
+                answers: ["Дифракция", "Дисперсия (распад на спектр)", "Поглощение"],
+                correct: 1
+            },
+            {
+                x: 10, z: -5, radius: 3,
+                title: "⚡ Станция 2: Бенджамин Франклин",
+                info: "В 1752 году Франклин провел знаменитый эксперимент с воздушным змеем во время грозы, доказав, что молния — это сильный электрический разряд.",
+                question: "Что изобрел Франклин для защиты зданий от ударов молний?",
+                answers: ["Громоотвод", "Электрический провод", "Конденсатор"],
+                correct: 0
+            },
+            {
+                x: -10, z: 5, radius: 3,
+                title: "🎈 Станция 3: Братья Монгольфье",
+                info: "В 1783 году во Франции братья Монгольфье совершили грандиозный прорыв — первый в истории полет человека на воздушном шаре.",
+                question: "Чем был наполнен первый шар братьев Монгольфье для создания подъемной силы?",
+                answers: ["Водородом", "Горячим дымом и воздухом", "Углекислым газом"],
+                correct: 1
+            },
+            {
+                x: 10, z: 5, radius: 3,
+                title: "🧪 Станция 4: Антуан Лавуазье",
+                info: "Лавуазье совершил революцию в химии: он окончательно доказал роль кислорода в процессах горения, окисления и дыхания.",
+                question: "Какую устаревшую теорию горения полностью опроверг Лавуазье своими опытами?",
+                answers: ["Теорию флогистона", "Теорию эфира", "Теорию атомизма"],
+                correct: 0
+            }
+        ];
+
+        const player = document.getElementById('player');
+        const ui = document.getElementById('ui-container');
+        let activeStation = null;
+
+        function checkPlayerPosition() {
+            if (!player) return;
+            const pos = player.getAttribute('position');
+            if (!pos || ui.style.display === "block") return;
+
+            let insideAnyStation = false;
+
+            stations.forEach((station) => {
+                let distance = Math.sqrt(Math.pow(pos.x - station.x, 2) + Math.pow(pos.z - station.z, 2));
+                if (distance < station.radius) {
+                    insideAnyStation = true;
+                    if (activeStation !== station) {
+                        openStationUI(station);
+                    }
+                }
+            });
+
+            if (!insideAnyStation) activeStation = null;
+        }
+
+        function openStationUI(station) {
+            activeStation = station;
+            document.getElementById('station-title').innerText = station.title;
+            document.getElementById('station-info').innerText = station.info;
+            document.getElementById('station-question').innerText = "Задание: " + station.question;
+            
+            const answersDiv = document.getElementById('answers-options');
+            answersDiv.innerHTML = "";
+
+            station.answers.forEach((answer, index) => {
+                const btn = document.createElement('button');
+                btn.className = "ui-btn";
+                btn.innerText = answer;
+                btn.onclick = () => checkAnswer(index, station.correct);
+                answersDiv.appendChild(btn);
+            });
+
+            ui.style.display = "block";
+        }
+
+        function checkAnswer(selectedIndex, correctIndex) {
+            if (selectedIndex === correctIndex) {
+                alert("🎉 Правильно! Историческое открытие успешно изучено.");
+                closeUI();
+            } else {
+                alert("❌ Неверно. Прочитай справку внимательнее и попробуй ещё раз!");
+            }
+        }
+
+        function closeUI() {
+            ui.style.display = "none";
+            // Немного сдвигаем игрока назад, чтобы окно не открывалось бесконечно, пока он стоит на месте
+            if (player) {
+                const pos = player.getAttribute('position');
+                player.setAttribute('position', {x: pos.x, y: pos.y, z: pos.z + 1});
+            }
+        }
+
+        // Запуск проверки с небольшим интервалом после полной загрузки страницы
+        window.addEventListener('load', () => {
+v
