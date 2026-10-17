@@ -27,11 +27,31 @@
             position: absolute; top: 10px; left: 10px; background: rgba(0,0,0,0.7);
             color: #fff; padding: 10px; border-radius: 4px; font-size: 13px; pointer-events: none;
         }
+        /* Стили для стартового экрана */
+        #start-screen {
+            position: absolute; top: 0; left: 0; width: 800px; height: 600px;
+            background: rgba(34, 20, 10, 0.9); display: flex; flex-direction: column;
+            justify-content: center; align-items: center; z-index: 20; color: #fff8eb;
+            border-radius: 4px;
+        }
+        .start-btn {
+            background-color: #8c6239; color: white; border: 2px solid #fff8eb;
+            padding: 15px 40px; font-size: 22px; cursor: pointer; border-radius: 8px;
+            margin-top: 20px; font-weight: bold;
+        }
+        .start-btn:hover { background-color: #5c3a21; }
     </style>
 </head>
 <body>
 
     <div id="game-wrapper">
+        <!-- Стартовое меню -->
+        <div id="start-screen">
+            <h1>📜 НАУЧНЫЙ КВЕСТ: XVIII ВЕК</h1>
+            <p>Управляйте персонажем и исследуйте великие открытия Европы!</p>
+            <button class="start-btn" onclick="startGame()">ИГРАТЬ 🚀</button>
+        </div>
+
         <div id="top-bar">
             <strong>📜 Европа XVIII века: Наука</strong><br>
             • Ходить: WASD или Стрелочки<br>
@@ -55,126 +75,81 @@
         const ui = document.getElementById('quest-ui');
 
         const player = { x: 400, y: 300, size: 22, speed: 5, color: '#0288d1' };
-        
-        // Надежное хранилище нажатых клавиш
         const keys = {};
 
         const places = [
             { x: 100, y: 100, size: 80, color: '#4caf50', label: 'Ньютон', title: '🏛️ Станция Исаака Ньютона', info: 'В начале 18 века Ньютон совершил революцию в оптике, объяснив устройство радуги и разложив белый свет через призму.', question: 'Как называется распад света на цвета спектра?', answers: ['Дисперсия', 'Дифракция', 'Интерференция'], correct: 0 },
             { x: 620, y: 100, size: 80, color: '#2196f3', label: 'Франклин', title: '⚡ Станция Б. Франклина', info: 'В 1752 году Франклин поймал молнию воздушным змеем и доказал, что это электричество.', question: 'Какое защитное устройство он изобрел после этого?', answers: ['Громоотвод', 'Изолятор', 'Резистор'], correct: 0 },
             { x: 100, y: 420, size: 80, color: '#ff9800', label: 'Монгольфье', title: '🎈 Станция братьев Монгольфье', info: 'В 1783 году во Франции их воздушный шар впервые поднял человека в воздух.', question: 'Каким газом они наполняли шар?', answers: ['Гелием', 'Горячим дымом/воздухом', 'Водородом'], correct: 1 },
-            { x: 620, y: 420, size: 80, color: '#e91e63', label: 'Лавуазье', title: '🧪 Станция А. Лавуазье', info: 'Лавуазье создал современную химию, доказав, что для горения необходим кислород.', question: 'Какую старую ложную теорию горения он опроверг?', answers: ['Теорию флогистона', 'Теорию алхимимии', 'Теорию эфира'], correct: 0 }
+            { x: 620, y: 420, size: 80, color: '#e91e63', label: 'Лавуазье', title: '🧪 Станция А. Лавуазье', info: 'Лавуазье создал современную химию, доказав, что для горения необходим кислород.', question: 'Какую старую ложную теорию горения он опроверг?', answers: ['Теорию флогистона', 'Теорию алхимии', 'Теорию эфира'], correct: 0 }
         ];
 
-        // Безопасный перехват клавиатуры без вылетов
-        window.addEventListener('keydown', e => {
-            const key = e.key.toLowerCase();
-            keys[key] = true;
-        });
-        
-        window.addEventListener('keyup', e => {
-            const key = e.key.toLowerCase();
-            keys[key] = false;
-        });
+        window.addEventListener('keydown', e => keys[e.key.toLowerCase()] = true);
+        window.addEventListener('keyup', e => keys[e.key.toLowerCase()] = false);
 
         function loop() {
-            // Движение обрабатывается только если интерфейс закрыт
             if (ui.style.display !== 'block') {
                 if (keys['w'] || keys['arrowup']) player.y -= player.speed;
                 if (keys['s'] || keys['arrowdown']) player.y += player.speed;
                 if (keys['a'] || keys['arrowleft']) player.x -= player.speed;
                 if (keys['d'] || keys['arrowright']) player.x += player.speed;
 
-                // Границы карты
                 if (player.x < 0) player.x = 0;
                 if (player.x > canvas.width - player.size) player.x = canvas.width - player.size;
                 if (player.y < 0) player.y = 0;
                 if (player.y > canvas.height - player.size) player.y = canvas.height - player.size;
 
-                // Проверка столкновений
                 places.forEach(p => {
-                    if (player.x < p.x + p.size && 
-                        player.x + player.size > p.x && 
-                        player.y < p.y + p.size && 
-                        player.y + player.size > p.y) {
+                    if (player.x < p.x + p.size && player.x + player.size > p.x && player.y < p.y + p.size && player.y + player.size > p.y) {
                         openQuest(p);
                     }
                 });
             }
 
-            // РЕНДЕРИНГ (работает всегда)
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
             // Брусчатка площади
             ctx.strokeStyle = '#cdbca6';
             ctx.lineWidth = 1;
-            for(let i = 0; i < canvas.width; i += 50) { 
-                ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i, canvas.height); ctx.stroke(); 
-            }
-            for(let j = 0; j < canvas.height; j += 50) { 
-                ctx.beginPath(); ctx.moveTo(0, j); ctx.lineTo(canvas.width, j); ctx.stroke(); 
-            }
+            for(let i=0; i<canvas.width; i+=50) { ctx.beginPath(); ctx.moveTo(i,0); ctx.lineTo(i,canvas.height); ctx.stroke(); }
+            for(let j=0; j<canvas.height; j+=50) { ctx.beginPath(); ctx.moveTo(0,j); ctx.lineTo(canvas.width,j); ctx.stroke(); }
 
             // Здания-станции
             places.forEach(p => {
-                ctx.fillStyle = p.color; 
-                ctx.fillRect(p.x, p.y, p.size, p.size);
-                
-                ctx.strokeStyle = '#2b1a0e'; 
-                ctx.lineWidth = 3; 
-                ctx.strokeRect(p.x, p.y, p.size, p.size);
-                
-                ctx.fillStyle = '#2b1a0e'; 
-                ctx.font = 'bold 14px sans-serif'; 
-                ctx.fillText(p.label, p.x + 5, p.y - 10);
+                ctx.fillStyle = p.color; ctx.fillRect(p.x, p.y, p.size, p.size);
+                ctx.strokeStyle = '#2b1a0e'; ctx.lineWidth = 3; ctx.strokeRect(p.x, p.y, p.size, p.size);
+                ctx.fillStyle = '#2b1a0e'; ctx.font = 'bold 14px sans-serif'; ctx.fillText(p.label, p.x + 5, p.y - 10);
             });
 
-            // Рисуем персонажа (Синий квадрат)
-            ctx.fillStyle = player.color;
-            ctx.fillRect(player.x, player.y, player.size, player.size);
-            ctx.strokeStyle = '#01579b';
-            ctx.lineWidth = 2;
-            ctx.strokeRect(player.x, player.y, player.size, player.size);
+            // Персонаж
+            ctx.fillStyle = player.color; ctx.fillRect(player.x, player.y, player.size, player.size);
+            ctx.strokeStyle = '#01579b'; ctx.strokeRect(player.x, player.y, player.size, player.size);
 
             requestAnimationFrame(loop);
         }
 
         function openQuest(p) {
-            // Очищаем зажатые клавиши, чтобы персонаж не бежал сам при открытии окна
-            for (let k in keys) keys[k] = false;
-
+            for (let k in keys) keys[k] = false; // сброс зажатых клавиш
             document.getElementById('q-title').innerText = p.title;
             document.getElementById('q-text').innerText = p.info;
             document.getElementById('q-question').innerText = p.question;
             const ansDiv = document.getElementById('q-answers');
             ansDiv.innerHTML = '';
-            
             p.answers.forEach((a, i) => {
-                const b = document.createElement('button'); 
-                b.className = 'ans-btn'; 
-                b.innerText = a;
-                b.onclick = () => { 
-                    if (i === p.correct) { 
-                        alert('🎉 Верно! Открытие зачитано.'); 
-                        closeQuest(); 
-                    } else { 
-                        alert('❌ Неправильно! Попробуй еще раз.'); 
-                    } 
-                };
+                const b = document.createElement('button'); b.className = 'ans-btn'; b.innerText = a;
+                b.onclick = () => { if (i === p.correct) { alert('🎉 Верно!'); closeQuest(); } else { alert('❌ Попробуй еще раз!'); } };
                 ansDiv.appendChild(b);
             });
             ui.style.display = 'block';
         }
 
-        function closeQuest() { 
-            ui.style.display = 'none'; 
-            // Отбрасываем персонажа в центр
-            player.x = 400; 
-            player.y = 300; 
-        }
+        function closeQuest() { ui.style.display = 'none'; player.x = 400; player.y = 300; }
 
-        // Запуск гарантирован сразу после парсинга скрипта
-        loop();
+        // Запуск игры по нажатию на стартовую кнопку
+        function startGame() {
+            document.getElementById('start-screen').style.display = 'none';
+            loop();
+        }
     </script>
 </body>
 </html>
