@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Европа XVIII века: Город Науки</title>
+    <!-- Подключаем библиотеку A-Frame для 3D графики прямо в HTML -->
+    <script src="https://aframe.io"></script>
+    <style>
+        /* Стили для интерфейса поверх 3D-сцены */
+        #ui-container {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80%;
+            max-width: 600px;
+            background: rgba(44, 34, 24, 0.9);
+            color: #f5ebe0;
+            padding: 20px;
+            border-radius: 10px;
+            border: 3px solid #8d6e63;
+            font-family: sans-serif;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+            display: none; /* Изначально скрыто */
+            z-index: 10;
+        }
+        .ui-btn {
+            background-color: #8d6e63;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 10px 5px 0 5px;
+            cursor: pointer;
+            font-size: 16px;
+            border-radius: 5px;
+        }
+        .ui-btn:hover { background-color: #a1887f; }
+        #instructions {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 10px;
+            font-family: sans-serif;
+            border-radius: 5px;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Инструкция для игрока -->
+    <div id="instructions">
+        <strong>Управление:</strong><br>
+        • Ходить: WASD или Стрелочки<br>
+        • Осмотреться: Мышка<br>
+        • Подойди к светящимся колоннам!
+    </div>
+
+    <!-- Интерфейс станций (задания и инфо) -->
+    <div id="ui-container">
+        <h2 id="station-title">Название станции</h2>
+        <p id="station-info">Информация об открытии...</p>
+        <div id="quiz-zone">
+            <p id="station-question"><strong>Задание:</strong> Вопрос...</p>
+            <div id="answers-options"></div>
+        </div>
+        <button class="ui-btn" onclick="closeUI()">Закрыть ❌</button>
+    </div>
+
+    <!-- 3D СЦЕНА -->
+    <a-scene>
+        <!-- Небо (имитация старинной атмосферы) -->
+        <a-sky color="#b5c6e0"></a-sky>
+
+        <!-- Земля (городская площадь) -->
+        <a-plane position="0 0 0" rotation="-90 0 0" width="100" height="100" color="#7d7367"></a-plane>
+
+        <!-- Окружение: Стены города/здания (имитация архитектуры) -->
+        <a-box position="0 5 -30" width="60" height="10" depth="2" color="#5c5346"></a-box>
+        <a-box position="-30 5 0" width="2" height="10" depth="60" color="#5c5346"></a-box>
+        <a-box position="30 5 0" width="2" height="10" depth="60" color="#5c5346"></a-box>
+        
+        <!-- Декорации: Старинные дома (кубы разного цвета) -->
+        <a-box position="-15 6 -20" width="10" height="12" depth="10" color="#8b7355"></a-box>
+        <a-box position="15 6 -20" width="10" height="12" depth="10" color="#a08060"></a-box>
+        <a-box position="-20 5 10" width="8" height="10" depth="12" color="#6b5b45"></a-box>
+
+        <!-- Камера игрока (глазами персонажа) -->
+        
+            <!-- Прицел в центре экрана, чтобы было видно куда идти -->
+            <a-cursor color="#ff0000" width="0.02"></a-cursor>
+        
+
+        <!-- ================= СТАНЦИИ НАУКИ ================= -->
+
+        <!-- Станция 1: Исаак Ньютон (Оптика/Гравитация) -->
+        
+            <a-cylinder radius="0.8" height="3" color="#4caf50" opacity="0.7"></a-cylinder> <!-- Светящийся столб -->
+            <a-box position="0 1.5 0" width="0.5" height="0.5" depth="0.5" color="#fff" animation="property: rotation; to: 0 360 0; loop: true; dur: 4000"></a-box>
+            <a-text value="1. Ньютон" align="center" position="0 3.5 0" scale="1.5 1.5 1.5" color="#000"></a-text>
+        
+
+        <!-- Станция 2: Бенджамин Франклин (Электричество) -->
+        
+            <a-cylinder radius="0.8" height="3" color="#2196f3" opacity="0.7"></a-cylinder>
+            <a-box position="0 1.5 0" width="0.5" height="0.5" depth="0.5" color="#fff" animation="property: rotation; to: 0 360 0; loop: true; dur: 4000"></a-box>
+            <a-text value="2. Франклин" align="center" position="0 3.5 0" scale="1.5 1.5 1.5" color="#000"></a-text>
+        
+
+        <!-- Станция 3: Братья Монгольфье (Воздушный шар) -->
+        
+            <a-cylinder radius="0.8" height="3" color="#ff9800" opacity="0.7"></a-cylinder>
+            <a-box position="0 1.5 0" width="0.5" height="0.5" depth="0.5" color="#fff" animation="property: rotation; to: 0 360 0; loop: true; dur: 4000"></a-box>
+            <a-text value="3. Монгольфье" align="center" position="0 3.5 0" scale="1.5 1.5 1.5" color="#000"></a-text>
+        
+
+        <!-- Станция 4: Антуан Лавуазье (Химия/Кислород) -->
+        
+            <a-cylinder radius="0.8" height="3" color="#e91e63" opacity="0.7"></a-cylinder>
+            <a-box position="0 1.5 0" width="0.5" height="0.5" depth="0.5" color="#fff" animation="property: rotation; to: 0 360 0; loop: true; dur: 4000"></a-box>
+            <a-text value="4. Лавуазье" align="center" position="0 3.5 0" scale="1.5 1.5 1.5" color="#000"></a-text>
+        
+
+    </a-scene>
+
+    <!-- Логика работы станций и проверки координат игрока -->
+    <script>
+        // Данные о станциях
+        const stations = [
+            {
+                x: -10, z: -5, radius: 2.5,
+                title: "🏛️ Станция 1: Исаак Ньютон",
+                info: "В начале XVIII века оптика и физика развивались благодаря Ньютону. Он создал телескоп-рефлектор и объяснил природу света, разложив его на цвета радуги с помощью призмы.",
+                question: "Какое явление продемонстрировал Ньютон, пропустив белый свет через призму?",
+                answers: ["Дифракция", "Дисперсия (распад на цвета)", "Поглощение"],
+                correct: 1
+            },
+            {
+                x: 10, z: -5, radius: 2.5,
+                title: "⚡ Станция 2: Бенджамин Франклин",
+                info: "В 1752 году Франклин провел знаменитый эксперимент с воздушным змеем во время грозы, доказав, что молния — это электричество, и изобрел громоотвод.",
+                question: "Что изобрел Франклин для защиты зданий от молний?",
+                answers: ["Громоотвод", "Электрический стул", "Батарейку"],
+                correct: 0
+            },
+            {
+                x: -10, z: 5, radius: 2.5,
+                title: "🎈 Станция 3: Братья Монгольфье",
+                info: "В 1783 году во Франции братья Монгольфье совершили первый в истории полет человека на воздушном шаре, надутом горячим воздухом.",
+                question: "Каким газом (веществом) был наполнен первый шар братьев Монгольфье?",
+                answers: ["Водород", "Горячий дым/воздух", "Гелий"],
+                correct: 1
+            },
+            {
+                x: 10, z: 5, radius: 2.5,
+                title: "🧪 Станция 4: Антуан Лавуазье",
+                info: "Лавуазье опроверг теорию флогистона, доказал роль кислорода в горении и дыхании, а также стал одним из создателей современной химии.",
+                question: "Какой важный химический элемент Лавуазье детально описал и назвал 'рождающим кислоту'?",
+                answers: ["Азот", "Углерод", "Кислород"],
+                correct: 2
+            }
+        ];
+
+        const player = document.getElementById('player');
+        const ui = document.getElementById('ui-container');
+        let activeStation = null;
+
+        // Постоянно проверяем, где находится игрок
+        function checkPlayerPosition() {
+            const pos = player.getAttribute('position');
+            
+            // Если открыто диалоговое окно, не переключаем станцию автоматически
+            if (ui.style.display === "block") return;
+
+            let insideAnyStation = false;
+
+            stations.forEach((station) => {
+                // Считаем расстояние между игроком и станцией на плоскости (X и Z)
+                let distance = Math.sqrt(Math.pow(pos.x - station.x, 2) + Math.pow(pos.z - station.z, 2));
+                
+                if (distance < station.radius) {
+                    insideAnyStation = true;
+                    if (activeStation !== station) {
+                        openStationUI(station);
+                    }
+                }
+            });
+
+            if (!insideAnyStation) {
+                activeStation = null;
+            }
+        }
+
+        function openStationUI(station) {
+            activeStation = station;
+            document.getElementById('station-title').innerText = station.title;
+            document.getElementById('station-info').innerText = station.info;
+            document.getElementById('station-question').innerText = "Задание: " + station.question;
+            
+            const answersDiv = document.getElementById('answers-options');
+            answersDiv.innerHTML = ""; // очищаем старые кнопки
+
+            station.answers.forEach((answer, index) => {
+                const btn = document.createElement('button');
+                btn.className = "ui-btn";
+                btn.innerText = answer;
+                btn.onclick = () => checkAnswer(index, station.correct);
+                answersDiv.appendChild(btn);
+            });
+
+            ui.style.display = "block";
+        }
+
+        function checkAnswer(selectedIndex, correctIndex) {
+            if (selectedIndex === correctIndex) {
+                alert("🎉 Правильно! Открытие усвоено.");
+ы
