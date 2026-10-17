@@ -29,13 +29,11 @@
 <body>
     <div id="game-view-wrapper">
         <div id="hud-dashboard">
-            <div class="hud-header">📜  ХРОНИКИ НАУКИ: XVIII ВЕК</div>
+            <div class="hud-header">📜 ХРОНИКИ НАУКИ: XVIII ВЕК</div>
             <div id="j-newton" class="journal-item"><span>1. Спектр Исаака Ньютона</span><span class="status-todo">В поиске</span></div>
             <div id="j-franklin" class="journal-item"><span>2. Змей Б. Франклина</span><span class="status-todo">В поиске</span></div>
             <div id="j-montgolfier" class="journal-item"><span>3. Шар братьев Монгольфье</span><span class="status-todo">В поиске</span></div>
-            <div id="j-lavoisier" class="journal-item"><span>4. Кислор
-17:10
-од А. Лавуазье</span><span class="status-todo">В поиске</span></div>
+            <div id="j-lavoisier" class="journal-item"><span>4. Кислород А. Лавуазье</span><span class="status-todo">В поиске</span></div>
             <div class="stats-counter"><span>Шаги: <strong id="step-count">0</strong></span><span>Погода: <strong style="color:#64b5f6;">Ясно</strong></span></div>
         </div>
         <canvas id="mainGameCanvas" width="800" height="600"></canvas>
@@ -49,9 +47,9 @@
             <button class="close-btn" onclick="closeParchmentUI()">Вернуться в город ❌</button>
         </div>
         <div id="victory-screen">
-            <h1 style="color:#ffca28; margin-bottom:15px;">📜  ЭПОХА ПРОСВЕЩЕНИЯ ПОКОРЕНА!</h1>
+            <h1 style="color:#ffca28; margin-bottom:15px;">📜 ЭПОХА ПРОСВЕЩЕНИЯ ПОКОРЕНА!</h1>
             <p style="font-size:16px; text-align:center; color:#e0d4be; max-width:500px;">Вы задокументировали все величайшие открытия XVIII века. Проект готов!</p>
-            <button class="choice-btn" style="width:auto; padding:10px 30px; margin-top:20px;" onclick="location.reload()">Начать заново 🔄 </button>
+            <button class="choice-btn" style="width:auto; padding:10px 30px; margin-top:20px;" onclick="location.reload()">Начать заново 🔄</button>
         </div>
     </div>
     <script>
@@ -60,17 +58,15 @@
         const quests = { newton: false, franklin: false, montgolfier: false, lavoisier: false };
         const worldObjects = [], citizens = [], particles = [], smokeParticles = [];
         const scienceStations = [
-            { id: 'newton', worldX: 850, worldY: 850, color: '#2e7d32', radius: 65, title: '🏛️  Оптика Ньютона', info: 'В начале XVIII века Ньютон пропустил луч солнца через стеклянную призму, доказав, что белый свет распадается на спектр цветов радуги.', question: 'Какое физическое явление открыл Ньютон, разложив белый свет?', choices: ['Дифракция электронов', 'Дисперсия света (преломление)', 'Люминесценция газов'], correct: 1 },
+            { id: 'newton', worldX: 850, worldY: 850, color: '#2e7d32', radius: 65, title: '🏛️ Оптика Ньютона', info: 'В начале XVIII века Ньютон пропустил луч солнца через стеклянную призму, доказав, что белый свет распадается на спектр цветов радуги.', question: 'Какое физическое явление открыл Ньютон, разложив белый свет?', choices: ['Дифракция электронов', 'Дисперсия света (преломление)', 'Люминесценция газов'], correct: 1 },
             { id: 'franklin', worldX: 2350, worldY: 850, color: '#1565c0', radius: 65, title: '⚡ Молния Франклина', info: 'В 1752 году Франклин запустил воздушного змея в грозу, доказал электрическую природу молний и изобрёл громоотвод.', question: 'Какое защитное устройство Франклин создал на основе этого опыта?', choices: ['Громоотвод', 'Предохранитель', 'Трансформатор'], correct: 0 },
-            { id: 'montgolfier', worldX: 850, worldY: 2350, color: '#ef6c00', radius: 65, title: '🎈  Шар братьев Монгольфье', info: 'В 1783 году во Франции братья Монгольфье подняли в воздух первый тепловой аэростат, надутый горячим дымом и воздухом.', question: 'За счёт какого принципа взлетал шар братьев Монгольфье?', choices: ['Сжатый гелий внутри', 'Разность плотности холодного и горячего воздуха', 'Водородный двигатель'], correct: 1 },
-            { id: 'lavoisier', worldX: 2350, worldY: 2350, color: '#c2185b', radius: 65, title: '🧪  Химия Лавуазье', info: 'Лавуазье доказал закон сохранения массы, выделил кислород и полностью опроверг старинную мифическую теорию горения флогистона.', question: 'Какую ложную теорию горения Лавуазье стёр из науки своими опытами?', choices: ['Концепцию флогистона', 'Учение об алхимическом эфире', 'Теорию кварков теплорода'], correct: 0 }
+            { id: 'montgolfier', worldX: 850, worldY: 2350, color: '#ef6c00', radius: 65, title: '🎈 Шар братьев Монгольфье', info: 'В 1783 году во Франции братья Монгольфье подняли в воздух первый тепловой аэростат, надутый горячим дымом и воздухом.', question: 'За счёт какого принципа взлетал шар братьев Монгольфье?', choices: ['Сжатый гелий внутри', 'Разность плотности холодного и горячего воздуха', 'Водородный двигатель'], correct: 1 },
+            { id: 'lavoisier', worldX: 2350, worldY: 2350, color: '#c2185b', radius: 65, title: '🧪 Химия Лавуазье', info: 'Лавуазье доказал закон сохранения массы, выделил кислород и полностью опроверг старинную мифическую теорию горения флогистона.', question: 'Какую ложную теорию горения Лавуазье стёр из науки своими опытами?', choices: ['Концепцию флогистона', 'Учение об алхимическом эфире', 'Теорию кварков теплорода'], correct: 0 }
         ];
         function createWaterSpray(x, y) { particles.push({ x: x, y: y, vx: (Math.random() - 0.5) * 2, vy: -Math.random() * 3 - 2, size: Math.random() * 2 + 1, alpha: 1 }); }
         function createSmoke(wx, wy, wz) { smokeParticles.push({ worldX: wx, worldY: wy, worldZ: wz, vx: (Math.random() - 0.3) * 0.3, vy: (Math.random() - 0.5) * 0.2, vz: Math.random() * 0.4 + 0.4, size: Math.random() * 3 + 2, alpha: 0.5 }); }
         function generateHistoricCity() {
-            worldObjects.push({ type: 'fountain', worldX: 16
-17:10
-00, worldY: 1600, size: 50, height: 16, sortY: 1600 });
+            worldObjects.push({ type: 'fountain', worldX: 1600, worldY: 1600, size: 50, height: 16, sortY: 1600 });
             for(let a = 0; a < Math.PI * 2; a += Math.PI / 4) { worldObjects.push({ type: 'lamp', worldX: 1600 + Math.sin(a) * 320, worldY: 1600 + Math.cos(a) * 320, sortY: 1600 + Math.cos(a) * 320 }); }
             worldObjects.push({ type: 'cathedral', worldX: 1500, worldY: 1200, w: 180, h: 180, d: 130, wallColor: '#cfd8dc', roofColor: '#263238', sortY: 1330 });
             for(let r = 0; r < 3; r++) {
@@ -106,9 +102,7 @@
             ctx.fillRect(left.x + (base.x-left.x)*0.7 - 5, tLeft.y + (base.y-left.y)*0.4, 12, 18); ctx.strokeRect(left.x + (base.x-left.x)*0.7 - 5, tLeft.y + (base.y-left.y)*0.4, 12, 18);
             ctx.fillStyle = '#4e342e'; ctx.beginPath(); ctx.moveTo(base.x, base.y); ctx.lineTo(right.x, right.y); ctx.lineTo(tRight.x, tRight.y); ctx.lineTo(tBase.x, tBase.y); ctx.closePath(); ctx.fill(); ctx.stroke();
             ctx.fillStyle = '#211003'; ctx.fillRect(base.x + (right.x-base.x)*0.5 - 8, base.y - 25, 16, 25);
-            let apex = toIsometric(h.worldX + h.w/2, h.worldY +
-17:10
-h.d/2, h.height + 40);
+            let apex = toIsometric(h.worldX + h.w/2, h.worldY + h.d/2, h.height + 40);
             ctx.fillStyle = h.roofColor; ctx.beginPath(); ctx.moveTo(tBase.x, tBase.y); ctx.lineTo(tLeft.x, tLeft.y); ctx.lineTo(apex.x, apex.y); ctx.closePath(); ctx.fill(); ctx.stroke();
             ctx.fillStyle = 'rgba(0, 0, 0, 0.2)'; ctx.beginPath(); ctx.moveTo(tBase.x, tBase.y); ctx.lineTo(tRight.x, tRight.y); ctx.lineTo(apex.x, apex.y); ctx.closePath(); ctx.fill(); ctx.stroke();
         }
@@ -147,9 +141,7 @@ h.d/2, h.height + 40);
             let sky = ctx.createLinearGradient(0, 0, 0, canvas.height); sky.addColorStop(0, '#1a2a6c'); sky.addColorStop(0.5, '#b21f1f'); sky.addColorStop(1, '#fdbb2d'); ctx.fillStyle = sky; ctx.fillRect(0, 0, canvas.width, canvas.height);
             ctx.strokeStyle = 'rgba(238, 223, 196, 0.15)';
             for(let x = 400; x <= 2800; x += 60) { let p1 = toIsometric(x, 400), p2 = toIsometric(x, 2800); ctx.beginPath(); ctx.moveTo(p1.x, p1.y); ctx.lineTo(p2.x, p2.y); ctx.stroke(); }
-            for(let y = 400; y <= 2800;
-17:10
-y += 60) { let p1 = toIsometric(400, y), p2 = toIsometric(2800, y); ctx.beginPath(); ctx.moveTo(p1.x, p1.y); ctx.lineTo(p2.x, p2.y); ctx.stroke(); }
+            for(let y = 400; y <= 2800; y += 60) { let p1 = toIsometric(400, y), p2 = toIsometric(2800, y); ctx.beginPath(); ctx.moveTo(p1.x, p1.y); ctx.lineTo(p2.x, p2.y); ctx.stroke(); }
             scienceStations.forEach(st => { let b = toIsometric(st.worldX, st.worldY); let ray = ctx.createLinearGradient(b.x, b.y, b.x, b.y - 350); ray.addColorStop(0, st.color); ray.addColorStop(1, 'rgba(255,255,255,0)'); ctx.fillStyle = ray; ctx.fillRect(b.x - 25, b.y - 350, 50, 350); });
             const queue = [];
             worldObjects.forEach(o => queue.push({ type: o.type, ref: o, sortY: o.sortY }));
@@ -180,17 +172,14 @@ y += 60) { let p1 = toIsometric(400, y), p2 = toIsometric(2800, y); ctx.beginPat
         }
         function openParchmentUI(st) {
             for(let k in keys) keys[k] = false;
-            document.getElementById('s-title').innerText = st.title; document.getElementById('s-text').innerText = st.info
-; document.getElementById('s-question').innerText = "Испытание: " + st.question;
-17:10
-const box = document.getElementById('s-choices'); box.innerHTML = '';
-            st.choices.forEach((choice, idx) => { const btn = document.createElement('button'); btn.className = 'choice-btn'; btn.innerText = choice; btn.onclick = () => verifyAnswer(st.id
-, idx, st.correct); box.appendChild(btn); });
+            document.getElementById('s-title').innerText = st.title; document.getElementById('s-text').innerText = st.info; document.getElementById('s-question').innerText = "Испытание: " + st.question;
+            const box = document.getElementById('s-choices'); box.innerHTML = '';
+            st.choices.forEach((choice, idx) => { const btn = document.createElement('button'); btn.className = 'choice-btn'; btn.innerText = choice; btn.onclick = () => verifyAnswer(st.id, idx, st.correct); box.appendChild(btn); });
             parchment.style.display = 'block';
         }
         function verifyAnswer(id, selected, correct) {
             if(selected === correct) {
-                alert("🎉  Правильно!"); quests[id] = true;
+                alert("🎉 Правильно!"); quests[id] = true;
                 document.getElementById('j-' + id).innerHTML = '<span>' + id.toUpperCase() + '</span><span class="status-done">Изучено ✓</span>';
                 closeParchmentUI();
                 if(quests.newton && quests.franklin && quests.montgolfier && quests.lavoisier) document.getElementById('victory-screen').style.display = 'flex';
