@@ -3,72 +3,71 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Европа XVIII века: Архитектура Просвещения 3D</title>
+    <title>Европа XVIII века: Реалистичные 3D Текстуры</title>
     <style>
-        /* Общие сбросы и подготовка экрана */
+        /* Полный сброс и центрирование игрового окна */
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body, html { width: 100%; height: 100%; overflow: hidden; background-color: #0c0805; font-family: 'Georgia', serif; display: flex; justify-content: center; align-items: center; }
+        body, html { width: 100%; height: 100%; overflow: hidden; background-color: #080503; font-family: 'Georgia', serif; display: flex; justify-content: center; align-items: center; }
         
-        /* Игровое окно фиксированного размера */
-        #game-view-wrapper { position: relative; width: 800px; height: 600px; box-shadow: 0 0 60px rgba(0,0,0,0.95); border: 4px solid #5c3a21; border-radius: 8px; overflow: hidden; }
-        canvas { background-color: #1a2634; display: block; width: 100%; height: 100%; }
+        /* Основной контейнер игры */
+        #game-view-wrapper { position: relative; width: 800px; height: 600px; box-shadow: 0 0 80px rgba(0,0,0,0.95); border: 4px solid #4a2f1b; border-radius: 8px; overflow: hidden; }
+        canvas { display: block; width: 100%; height: 100%; background-color: #0b111e; }
         
-        /* Стилизация интерфейса "Свиток" */
+        /* Стилизация аутентичного пергамента */
         #ui-parchment { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 85%; max-width: 500px; background: #f7f1da; color: #26170c; padding: 25px; border-radius: 6px; border: 12px double #4a321a; box-shadow: 0 25px 70px rgba(0,0,0,0.9); text-align: center; display: block; z-index: 500; background-image: radial-gradient(circle, #faf6eb 60%, #e6d4aa 100%); }
         .scroll-title { font-size: 22px; font-weight: bold; color: #4a2f13; margin-bottom: 12px; border-bottom: 3px double #8d6e63; padding-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; }
         .scroll-text { font-size: 14px; line-height: 1.5; text-align: justify; margin-bottom: 15px; color: #3e2723; }
         
-        /* Контейнер интерактивной викторины */
+        /* Викторина */
         .quiz-container { background: rgba(141, 110, 99, 0.08); padding: 12px; border-radius: 8px; border: 2px dashed #a1887f; margin-bottom: 15px; }
         .quiz-question { font-size: 15px; font-weight: bold; margin-bottom: 10px; color: #5d4037; }
         .choice-btn { display: block; width: 100%; background: #9c7853; color: #fffcf5; border: 2px solid #5c3a21; padding: 10px; margin: 6px 0; cursor: pointer; font-size: 14px; font-weight: bold; border-radius: 4px; text-align: left; transition: all 0.2s ease; }
         .choice-btn:hover { background: #5c3a21; color: #ffffff; transform: translateX(5px); }
         
-        /* Кнопка закрытия */
         .close-btn { background: #c62828; color: white; border: 2px solid #7f1d1d; padding: 10px 20px; font-size: 14px; font-weight: bold; border-radius: 4px; cursor: pointer; text-transform: uppercase; margin-top: 10px; transition: background 0.2s; }
         .close-btn:hover { background: #b71c1c; }
         
-        /* Подсказка по управлению на экране */
-        #controls-hint { position: absolute; bottom: 15px; left: 15px; color: #fffcf5; font-size: 12px; background: rgba(0,0,0,0.6); padding: 6px 12px; border-radius: 4px; pointer-events: none; }
+        #controls-hint { position: absolute; bottom: 15px; left: 15px; color: #fffcf5; font-size: 12px; background: rgba(0,0,0,0.7); padding: 6px 12px; border-radius: 4px; pointer-events: none; border: 1px solid #4a2f1b; }
     </style>
 </head>
 <body>
 
 <div id="game-view-wrapper">
+    <!-- Основной 3D экран -->
     <canvas id="gameCanvas" width="800" height="600"></canvas>
     
+    <!-- Пергаментный интерфейс -->
     <div id="ui-parchment">
-        <div class="scroll-title">Архитектура XVIII века</div>
-        <p class="scroll-text">Перед вами панорама европейского города эпохи Просвещения. Классические кирпичные фасады, ритмичные ряды окон и черепичные крыши.</p>
+        <div class="scroll-title">Эпоха Просвещения 3D</div>
+        <p class="scroll-text">Перед вами полноценный псевдотрехмерный движок, использующий классический метод проекции лучей и попиксельное наложение текстур высокого разрешения.</p>
         <div class="quiz-container">
-            <div class="quiz-question">Какой архитектурный стиль сменил избыточное Барокко во второй половине XVIII века?</div>
-            <button class="choice-btn" onclick="checkAnswer(true)">Классицизм</button>
-            <button class="choice-btn" onclick="checkAnswer(false)">Готика</button>
-            <button class="choice-btn" onclick="checkAnswer(false)">Модерн</button>
+            <div class="quiz-question">В какой европейской стране в XVIII веке зародился промышленный переворот?</div>
+            <button class="choice-btn" onclick="checkAnswer(true)">Великобритания</button>
+            <button class="choice-btn" onclick="checkAnswer(false)">Франция</button>
+            <button class="choice-btn" onclick="checkAnswer(false)">Германия</button>
         </div>
-        <button class="close-btn" onclick="toggleUI()">Закрыть свиток</button>
+        <button class="close-btn" onclick="toggleUI()">Войти в город</button>
     </div>
 
-    <div id="controls-hint">Управление: Стрелки Влево / Вправо или клавиши A / D для поворота камеры</div>
+    <div id="controls-hint">Управление: Клавиши Стрелка Влево / Вправо (или A / D) для обзора города</div>
 </div>
 <script>
-    // --- ИНИЦИАЛИЗАЦИЯ И НАСТРОЙКИ ---
+    // --- НАСТРОЙКИ ДВИЖКА И КАРТЫ ---
     const canvas = document.getElementById('gameCanvas');
     const ctx = canvas.getContext('2d');
 
-    // Размеры игрового мира и параметры игрока
     const MAP_WIDTH = 12;
     const MAP_HEIGHT = 12;
     let playerX = 3.5;
     let playerY = 3.5;
-    let playerAngle = 0.5; // Угол взгляда игрока (в радианах)
-    const FOV = Math.PI / 3; // Поле зрения (60 градусов)
+    let playerAngle = 0.6; // Направление взгляда
+    const FOV = Math.PI / 3; // Угол обзора (60 градусов)
     const HALF_FOV = FOV / 2;
-    const NUM_RAYS = 400; // Количество лучей (ширина полосы рендера)
+    const NUM_RAYS = 400; // Количество лучей (ширина столбца рендера = 2px)
     const STEP_ANGLE = FOV / NUM_RAYS;
-    const MAX_DEPTH = 16; // Максимальная дальность прорисовки
+    const MAX_DEPTH = 16.0; // Максимальная видимость
 
-    // Карта города XVIII века: 1 - стена дома, 2 - угловая башня, 0 - мостовая
+    // Карта города: 1 - Жилой дом, 2 - Каменная башня, 0 - Пусто (улица)
     const gameMap = [,
  ,
  ,
@@ -83,124 +82,151 @@
         [1,1,1,1,1,1,1,1,1,1,1,1]
     ];
 
-    // Состояния клавиатуры
     const keys = { Left: false, Right: false };
 
-    // --- ИНТЕРФЕЙСНЫЕ ФУНКЦИИ ---
     function toggleUI() {
         const ui = document.getElementById('ui-parchment');
         ui.style.display = ui.style.display === 'none' ? 'block' : 'none';
     }
 
     function checkAnswer(isCorrect) {
-        if (isCorrect) {
-            alert('Изумительно! Классицизм вернул архитектуре строгость пропорций античности.');
-        } else {
-            alert('Увы, это не так. Попробуйте всмотреться в строгие линии фасадов.');
-        }
+        if (isCorrect) alert('Абсолютно верно! Мануфактуры Англии перевернули мировую историю.');
+        else alert('Не совсем. Попробуйте вспомнить, где зародился первый фабричный текстиль.');
     }
 
-    // --- ПРОЦЕДУРНАЯ ГЕНЕРАЦИЯ ТЕКСТУРЫ ДОМА ---
-    // Рисует вертикальный срез стены с кирпичами и окнами
-    function drawWallSlice(x, wallHeight, textureX, distance, wallType) {
-        const screenHeight = 600;
-        const wallTop = (screenHeight - wallHeight) / 2;
-        const wallBottom = wallTop + wallHeight;
+    // --- БУФЕРЫ ТЕКСТУР БЕЗ УПРОЩЕНИЙ ---
+    const TEX_SIZE = 256; // Высокое разрешение текстурного полотна
+    const textures = {
+        1: document.createElement('canvas'), // Текстура кирпичного дома
+        2: document.createElement('canvas')  // Текстура башни
+    };
 
-        // Эффект затухания света с расстоянием (туман)
-        const shade = Math.max(0.2, 1 - (distance / MAX_DEPTH));
-
-        // Базовые цвета кирпичного фасада
-        let baseR = 150, baseG = 65, baseB = 45; // Красный кирпич
-        if (wallType === 2) { baseR = 110; baseG = 105; baseB = 95; } // Старый камень башни
-
-        // 1. Отрисовка несущей стены с градиентом объема
-        ctx.fillStyle = `rgb(${baseR * shade}, ${baseG * shade}, ${baseB * shade})`;
-        ctx.fillRect(x, wallTop, 2, wallHeight);
-
-        // 2. Наложение текстурных деталей (швы и окна)
-        // Переводим координату x текстуры и y экрана в циклические узоры
-        const brickScaleX = Math.floor(textureX * 8) % 2;
+    // Процедурный рендеринг текстур в буфер памяти при запуске
+    function generateTextures() {
+        // --- ТЕКСТУРА 1: ЕВРОПЕЙСКИЙ ФАСАД ---
+        const t1 = textures[1].getContext('2d');
+        textures[1].width = TEX_SIZE;
+        textures[1].height = TEX_SIZE;
         
-        for (let y = 0; y < wallHeight; y += 4) {
-            const worldY = wallTop + y;
-            
-            // Имитация кирпичных рядов
-            if (Math.floor(worldY / 6) % 2 === 0 && brickScaleX === 0) {
-                ctx.fillStyle = `rgba(50, 40, 35, ${0.4 * shade})`;
-                ctx.fillRect(x, worldY, 2, 1);
-            }
+        // Базовый цвет кирпичной стены
+        t1.fillStyle = '#9c4431';
+        t1.fillRect(0, 0, TEX_SIZE, TEX_SIZE);
 
-            // Ритмичные ряды окон (европейский стиль XVIII века)
-            const windowRow = Math.floor((y / wallHeight) * 5); // 5 этажей окон
-            const windowCol = Math.floor(textureX * 4);         // 4 окна по ширине стены
-            
-            if (windowRow > 0 && windowRow < 4 && windowCol > 0 && windowCol < 3) {
-                const innerY = (y / wallHeight * 5) % 1;
-                const innerX = (textureX * 4) % 1;
-
-                // Если луч попал внутрь оконной рамы
-                if (innerX > 0.25 && innerX < 0.75 && innerY > 0.2 && innerY < 0.8) {
-                    // Свет в окнах (желтое вечернее свечение)
-                    ctx.fillStyle = `rgba(253, 225, 130, ${0.85 * shade})`;
-                    ctx.fillRect(x, worldY, 2, 1);
-                    
-                    // Оконный переплет (рамы)
-                    if (Math.abs(innerX - 0.5) < 0.05 || Math.abs(innerY - 0.5) < 0.05) {
-                        ctx.fillStyle = `rgba(40, 30, 20, ${0.7 * shade})`;
-                        ctx.fillRect(x, worldY, 2, 1);
-                    }
-                }
+        // Рисуем ряды кирпичей
+        t1.fillStyle = '#6e2d20';
+        for (let y = 0; y < TEX_SIZE; y += 8) {
+            t1.fillRect(0, y, TEX_SIZE, 1); // Горизонтальные швы
+            let offset = (y / 8) % 2 === 0 ? 0 : 8;
+            for (let x = offset; x < TEX_SIZE; x += 16) {
+                t1.fillRect(x, y, 1, 8); // Вертикальные швы
             }
         }
+
+        // Рисуем декоративные белые карнизы (стиль XVIII века)
+        t1.fillStyle = '#eadeca';
+        t1.fillRect(0, 0, TEX_SIZE, 12);
+        t1.fillRect(0, Math.floor(TEX_SIZE / 2) - 6, TEX_SIZE, 12);
+        t1.fillRect(0, TEX_SIZE - 12, TEX_SIZE, 12);
+
+        // Размещаем классические окна
+        for (let row = 0; row < 2; row++) {
+            let startY = row === 0 ? 30 : 155;
+            for (let col = 0; col < 3; col++) {
+                let startX = 25 + col * 80;
+
+                // Наличники и подоконник
+                t1.fillStyle = '#d1c2a5';
+                t1.fillRect(startX - 4, startY - 4, 48, 68);
+
+                // Темная оконная ниша
+                t1.fillStyle = '#1a1311';
+                t1.fillRect(startX, startY, 40, 60);
+
+                // Теплое свечение стекол внутри
+                t1.fillStyle = '#fce592';
+                t1.fillRect(startX + 3, startY + 3, 14, 24);
+                t1.fillRect(startX + 23, startY + 3, 14, 24);
+                t1.fillRect(startX + 3, startY + 31, 14, 24);
+                t1.fillRect(startX + 23, startY + 31, 14, 24);
+
+                // Рамы окон
+                t1.fillStyle = '#473525';
+                t1.fillRect(startX, startY + 27, 40, 4);
+                t1.fillRect(startX + 17, startY, 6, 60);
+            }
+        }
+
+        // --- ТЕКСТУРА 2: СТАРЫЙ КАМЕНЬ БАШНИ ---
+        const t2 = textures[2].getContext('2d');
+        textures[2].width = TEX_SIZE;
+        textures[2].height = TEX_SIZE;
+        
+        t2.fillStyle = '#737068';
+        t2.fillRect(0, 0, TEX_SIZE, TEX_SIZE);
+
+        // Нарезка крупных каменных блоков
+        t2.fillStyle = '#3a3835';
+        for (let y = 0; y < TEX_SIZE; y += 32) {
+            t2.fillRect(0, y, TEX_SIZE, 2);
+            let offset = (y / 32) % 2 === 0 ? 0 : 32;
+            for (let x = offset; x < TEX_SIZE; x += 64) {
+                t2.fillRect(x, y, 2, 32);
+            }
+        }
+        // Добавляем текстурный шум на камни
+        for (let i = 0; i < 400; i++) {
+            let rx = Math.floor(Math.random() * TEX_SIZE);
+            let ry = Math.floor(Math.random() * TEX_SIZE);
+            t2.fillStyle = Math.random() > 0.5 ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.15)';
+            t2.fillRect(rx, ry, 2, 2);
+        }
     }
-    // --- ДВИЖОК СКАНИРОВАНИЯ ЛУЧЕЙ (RAYCASTING) ---
+
+    // Генерируем буферные холсты один раз при инициализации скрипта
+    generateTextures();
+    // --- ДВИЖОК РЕАЛИСТИЧНОГО ТЕКСТУРИРОВАНИЯ ---
     function render3D() {
-        // 1. Очистка экрана и отрисовка неба/земли
-        // Небо (атмосферный вечерний градиент)
+        // 1. Атмосферный градиентный фон неба (вечер)
         let skyGrad = ctx.createLinearGradient(0, 0, 0, 300);
-        skyGrad.addColorStop(0, '#111625');
-        skyGrad.addColorStop(0.6, '#2a3a5c');
-        skyGrad.addColorStop(1, '#614856');
+        skyGrad.addColorStop(0, '#0a0d1a');
+        skyGrad.addColorStop(0.5, '#1e2942');
+        skyGrad.addColorStop(1, '#4d374b');
         ctx.fillStyle = skyGrad;
         ctx.fillRect(0, 0, 800, 300);
 
-        // Земля (каменная мостовая)
+        // Земля (каменная брусчатка)
         let floorGrad = ctx.createLinearGradient(0, 300, 0, 600);
-        floorGrad.addColorStop(0, '#1c1a17');
-        floorGrad.addColorStop(1, '#0d0c0a');
+        floorGrad.addColorStop(0, '#141311');
+        floorGrad.addColorStop(1, '#050504');
         ctx.fillStyle = floorGrad;
         ctx.fillRect(0, 300, 800, 300);
 
-        // Отрисовка текстурных деталей брусчатки на переднем плане
-        ctx.fillStyle = 'rgba(25, 20, 15, 0.3)';
-        for (let i = 320; i < 600; i += 15) {
-            ctx.fillRect(0, i, 800, 2);
+        // Отрисовка стыков плит мостовой
+        ctx.fillStyle = 'rgba(20, 15, 12, 0.4)';
+        for (let i = 310; i < 600; i += 12) {
+            ctx.fillRect(0, i, 800, 1);
         }
 
-        // 2. Бросание лучей для каждого вертикального столбца пикселей
+        // 2. Основной цикл бросания лучей
         let startAngle = playerAngle - HALF_FOV;
 
         for (let i = 0; i < NUM_RAYS; i++) {
             let rayAngle = startAngle + i * STEP_ANGLE;
-            
-            // Нормализация угла луча
             let sin = Math.sin(rayAngle);
             let cos = Math.cos(rayAngle);
 
             let distanceToWall = 0;
             let hitWall = false;
             let wallType = 0;
-            let textureX = 0; // Координата пересечения со стеной (0.0 - 1.0)
+            let textureX = 0; 
 
-            // Продвижение луча вперед
+            // Поиск пересечения со стеной
             while (!hitWall && distanceToWall < MAX_DEPTH) {
-                distanceToWall += 0.04;
+                distanceToWall += 0.02; // Маленький шаг для высокой точности
                 
                 let checkX = Math.floor(playerX + cos * distanceToWall);
                 let checkY = Math.floor(playerY + sin * distanceToWall);
 
-                // Проверка выхода за границы карты
                 if (checkX < 0 || checkX >= MAP_WIDTH || checkY < 0 || checkY >= MAP_HEIGHT) {
                     hitWall = true;
                     distanceToWall = MAX_DEPTH;
@@ -210,52 +236,63 @@
                         hitWall = true;
                         wallType = tile;
 
-                        // Вычисляем точное место попадания луча на грань блока для текстурирования
                         let hitX = playerX + cos * distanceToWall;
                         let hitY = playerY + sin * distanceToWall;
                         
                         let blockX = hitX - Math.floor(hitX);
                         let blockY = hitY - Math.floor(hitY);
                         
-                        // Определяем, с какой стороной блока столкнулся луч (север/юг или восток/запад)
-                        if (Math.abs(blockY) < 0.05 || Math.abs(blockY - 1) < 0.05) {
-                            textureX = blockX;
+                        // Запоминаем точную координату на текстуре (от 0 до TEX_SIZE)
+                        if (Math.abs(blockY) < 0.03 || Math.abs(blockY - 1) < 0.03) {
+                            textureX = Math.floor(blockX * TEX_SIZE);
                         } else {
-                            textureX = blockY;
+                            textureX = Math.floor(blockY * TEX_SIZE);
                         }
                     }
                 }
             }
 
-            // Устранение эффекта "рыбьего глаза" (сферического искажения)
+            // Коррекция дисторсии (эффекта рыбьего глаза)
             let correctedDistance = distanceToWall * Math.cos(rayAngle - playerAngle);
+            let wallHeight = Math.min(600, Math.floor(450 / correctedDistance));
 
-            // Вычисление высоты стены на экране на основе расстояния
-            let wallHeight = Math.min(600, Math.floor(400 / correctedDistance));
+            let screenX = i * 2; // Каждая полоса занимает 2 пикселя в ширину
+            let wallTop = Math.floor((600 - wallHeight) / 2);
 
-            // Ширина одной полосы на экране (800 пикселей / 400 лучей = 2 пикселя на луч)
-            let screenX = i * 2;
-
-            // Отрисовка элемента крыши (черепичный скат над домом)
             if (distanceToWall < MAX_DEPTH) {
-                let wallTop = (600 - wallHeight) / 2;
-                let roofHeight = wallHeight * 0.35; // Высота треугольной крыши
-                let shade = Math.max(0.15, 1 - (distanceToWall / MAX_DEPTH));
+                // Выбираем холст-источник нужной текстуры
+                const activeTexCanvas = textures[wallType];
+
+                // Отрезаем вертикальный срез шириной в 1 пиксель из текстуры высокого разрешения
+                // и масштабируем его на экран по высоте стены
+                ctx.drawImage(
+                    activeTexCanvas,
+                    textureX, 0, 1, TEX_SIZE,          // Срез на текстуре (X, Y, Ширина, Высота)
+                    screenX, wallTop, 2, wallHeight    // Проекция на экран (X, Y, Ширина, Высота)
+                );
+
+                // Отрисовка объемной крыши над этим срезом стены
+                let roofHeight = wallHeight * 0.4;
+                let shade = Math.max(0.1, 1 - (distanceToWall / MAX_DEPTH));
+                ctx.fillStyle = `rgb(${110 * shade}, ${35 * shade}, ${25 * shade})`;
                 
-                ctx.fillStyle = `rgb(${120 * shade}, ${40 * shade}, ${30 * shade})`; // Старая черепица
                 ctx.beginPath();
                 ctx.moveTo(screenX, wallTop);
                 ctx.lineTo(screenX + 2, wallTop);
                 ctx.lineTo(screenX + 1, wallTop - roofHeight);
                 ctx.fill();
 
-                // Отрисовка качественной стены дома из Части 2
-                drawWallSlice(screenX, wallHeight, textureX, correctedDistance, wallType);
+                // Реалистичное наложение тени с расстоянием (эффект глубины/тумана)
+                if (distanceToWall > 2) {
+                    let shadowAlpha = Math.min(0.85, (distanceToWall / MAX_DEPTH));
+                    ctx.fillStyle = `rgba(11, 17, 30, ${shadowAlpha})`;
+                    ctx.fillRect(screenX, wallTop, 2, wallHeight);
+                }
             }
         }
     }
 
-    // --- ОБРАБОТКА ВВОДА КЛАВИАТУРЫ ---
+    // --- СЛУШАТЕЛИ КЛАВИАТУРЫ ---
     window.addEventListener('keydown', function(e) {
         if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A' || e.key === 'ф' || e.key === 'Ф') keys.Left = true;
         if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D' || e.key === 'в' || e.key === 'В') keys.Right = true;
@@ -266,26 +303,22 @@
         if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D' || e.key === 'в' || e.key === 'В') keys.Right = false;
     });
 
-    // --- ГЛАВНЫЙ ИГРОВОЙ ЦИКЛ ---
+    // --- КЛАССИЧЕСКИЙ ТАКТ ИГРЫ ---
     function updateGame() {
-        // Поворот камеры (изменение угла направления взгляда)
         if (keys.Left) {
-            playerAngle -= 0.03;
+            playerAngle -= 0.035;
             if (playerAngle < 0) playerAngle += Math.PI * 2;
         }
         if (keys.Right) {
-            playerAngle += 0.03;
+            playerAngle += 0.035;
             if (playerAngle > Math.PI * 2) playerAngle -= Math.PI * 2;
         }
 
-        // Рендеринг обновленного кадра
         render3D();
-
-        // Запрос следующего кадра анимации
         requestAnimationFrame(updateGame);
     }
 
-    // Запуск движка
+    // Инициализация игрового цикла
     updateGame();
 </script>
 </body>
