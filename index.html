@@ -3,24 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Европа XVIII века: 4 Научные Станции 3D</title>
+    <title>Европа XVIII века: Фотореалистичный 3D Музей</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body, html { width: 100%; height: 100%; overflow: hidden; background-color: #0c0805; font-family: 'Georgia', serif; display: flex; justify-content: center; align-items: center; }
+        body, html { width: 100%; height: 100%; overflow: hidden; background-color: #060403; font-family: 'Georgia', serif; display: flex; justify-content: center; align-items: center; }
         
-        #game-view-wrapper { position: relative; width: 800px; height: 600px; box-shadow: 0 0 70px rgba(0,0,0,0.95); border: 4px solid #5c3a21; border-radius: 8px; overflow: hidden; }
-        canvas { display: block; width: 100%; height: 100%; background-color: #111625; }
+        #game-view-wrapper { position: relative; width: 800px; height: 600px; box-shadow: 0 0 80px rgba(0,0,0,0.95); border: 5px solid #3d2514; border-radius: 10px; overflow: hidden; }
+        canvas { display: block; width: 100%; height: 100%; background-color: #060810; }
         
-        /* Свиток появляется ТОЛЬКО у станций */
-        #ui-parchment { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 85%; max-width: 520px; background: #f7f1da; color: #26170c; padding: 25px; border-radius: 6px; border: 12px double #4a321a; box-shadow: 0 25px 70px rgba(0,0,0,0.9); text-align: center; display: none; z-index: 500; background-image: radial-gradient(circle, #faf6eb 60%, #e6d4aa 100%); }
-        .scroll-title { font-size: 20px; font-weight: bold; color: #4a2f13; margin-bottom: 12px; border-bottom: 3px double #8d6e63; padding-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; }
-        .scroll-text { font-size: 14px; line-height: 1.6; text-align: justify; margin-bottom: 15px; color: #3e2723; }
+        #ui-parchment { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 85%; max-width: 520px; background: #f7f1da; color: #26170c; padding: 30px; border-radius: 6px; border: 12px double #4a321a; box-shadow: 0 30px 80px rgba(0,0,0,0.95); text-align: center; display: none; z-index: 500; background-image: radial-gradient(circle, #faf6eb 50%, #e3ce9c 100%); }
+        .scroll-title { font-size: 21px; font-weight: bold; color: #4a2f13; margin-bottom: 14px; border-bottom: 3px double #8d6e63; padding-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; text-shadow: 1px 1px 0px rgba(255,255,255,0.5); }
+        .scroll-text { font-size: 14px; line-height: 1.6; text-align: justify; margin-bottom: 15px; color: #3e2723; font-style: italic; }
         
-        .station-badge { display: inline-block; background: #4a321a; color: #f7f1da; padding: 4px 10px; font-size: 11px; border-radius: 4px; text-transform: uppercase; margin-bottom: 10px; font-weight: bold; }
-        .close-btn { background: #5c3a21; color: white; border: 1px solid #3e2723; padding: 8px 20px; font-size: 13px; font-weight: bold; border-radius: 4px; cursor: pointer; text-transform: uppercase; margin-top: 5px; }
-        .close-btn:hover { background: #442a16; }
+        .station-badge { display: inline-block; background: #5c3a21; color: #f7f1da; padding: 5px 12px; font-size: 11px; border-radius: 4px; text-transform: uppercase; margin-bottom: 12px; font-weight: bold; letter-spacing: 1px; box-shadow: i0 2px 4px rgba(0,0,0,0.2); }
+        .close-btn { background: #4a321a; color: white; border: 1px solid #26170c; padding: 10px 24px; font-size: 12px; font-weight: bold; border-radius: 4px; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; margin-top: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.3); transition: background 0.2s; }
+        .close-btn:hover { background: #332010; }
         
-        #controls-hint { position: absolute; bottom: 15px; left: 15px; color: #fffcf5; font-size: 12px; background: rgba(0,0,0,0.8); padding: 8px 14px; border-radius: 4px; pointer-events: none; border: 1px solid #5c3a21; line-height: 1.4; }
+        #controls-hint { position: absolute; bottom: 15px; left: 15px; color: #fcf8f2; font-size: 12px; background: rgba(12, 8, 5, 0.85); padding: 10px 16px; border-radius: 5px; pointer-events: none; border: 1px solid #5c3a21; line-height: 1.5; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
     </style>
 </head>
 <body>
@@ -28,18 +27,17 @@
 <div id="game-view-wrapper">
     <canvas id="gameCanvas" width="800" height="600"></canvas>
     
-    <!-- Информационный пергамент научных открытий -->
     <div id="ui-parchment">
         <div class="station-badge" id="station-label">Научная станция</div>
         <div class="scroll-title" id="station-title">Название открытия</div>
         <p class="scroll-text" id="station-text">Описание...</p>
-        <button class="close-btn" onclick="closeStationUI()">Отойдите, чтобы закрыть</button>
+        <button class="close-btn" onclick="closeStationUI()">Продолжить путь</button>
     </div>
 
     <div id="controls-hint">
-        <strong>Управление исследователя:</strong><br>
-        • Ходьба: клавиши <b>W / S</b> (или Стрелки Вверх / Вниз)<br>
-        • Поворот камеры: клавиши <b>A / D</b> (или Стрелки Влево / Вправо)
+        <strong>Прогулка по Научному Кварталу:</strong><br>
+        • Движение: клавиши <b>W / S</b> (или Стрелки Вверх / Вниз)<br>
+        • Поворот обзора: клавиши <b>A / D</b> (или Стрелки Влево / Вправо)
     </div>
 </div>
 
@@ -49,8 +47,6 @@
 
     const MAP_WIDTH = 12;
     const MAP_HEIGHT = 12;
-    
-    // Игрок начинает в центре пустой площади
     let playerX = 6.5;
     let playerY = 6.5;
     let playerAngle = 0.0; 
@@ -61,113 +57,438 @@
     const STEP_ANGLE = FOV / NUM_RAYS;
     const MAX_DEPTH = 16.0;
 
-    // Сетка карты
     const gameMap = [];
-
-    // Клавиши управления (добавили Forward и Backward для ходьбы)
     const keys = { Left: false, Right: false, Forward: false, Backward: false };
     let activeStation = null;
 
-    // Буферы текстур (1 - дом, 2 - башня, 3,4,5,6 - научные павильоны)
-    const TEX_SIZE = 64;
+    // Высокое разрешение текстур 128x128 пикселей для максимальной четкости без шума
+    const TEX_SIZE = 128;
     const textures = {
-        1: new Array(TEX_SIZE * TEX_SIZE),
-        2: new Array(TEX_SIZE * TEX_SIZE),
-        3: new Array(TEX_SIZE * TEX_SIZE), // Павильон 1
-        4: new Array(TEX_SIZE * TEX_SIZE), // Павильон 2
-        5: new Array(TEX_SIZE * TEX_SIZE), // Павильон 3
-        6: new Array(TEX_SIZE * TEX_SIZE)  // Павильон 4
+        1: new Array(TEX_SIZE * TEX_SIZE), // Классический жилой дом
+        2: new Array(TEX_SIZE * TEX_SIZE), // Городская ратуша / Башня
+        3: new Array(TEX_SIZE * TEX_SIZE), // Станция Паровой Машины (Дом архитектуры барокко)
+        4: new Array(TEX_SIZE * TEX_SIZE), // Станция Химии (Лабораторный дом)
+        5: new Array(TEX_SIZE * TEX_SIZE), // Станция Физики (Академическое здание)
+        6: new Array(TEX_SIZE * TEX_SIZE)  // Станция Медицины (Госпитальный дом)
     };
 
-    function createProceduralTextures() {
+    // Вспомогательная функция для генерации цвета с шумом старины
+    function blendNoise(hex, noise) {
+        let r = parseInt(hex.slice(1,3), 16) + noise;
+        let g = parseInt(hex.slice(3,5), 16) + noise;
+        let b = parseInt(hex.slice(5,7), 16) + noise;
+        r = Math.max(0, Math.min(255, r));
+        g = Math.max(0, Math.min(255, g));
+        b = Math.max(0, Math.min(255, b));
+        return `rgb(${r},${g},${b})`;
+    }
+
+    function generateUltraTextures() {
         for (let y = 0; y < TEX_SIZE; y++) {
             for (let x = 0; x < TEX_SIZE; x++) {
                 let idx = y * TEX_SIZE + x;
+                let noise = Math.floor(Math.random() * 16) - 8; // Шум текстуры камня
 
-                // 1. Обычный кирпичный дом
-                if (y % 4 === 0 || (x % 8 === 0 && Math.floor(y / 4) % 2 === 0)) {
-                    textures[1][idx] = '#5c271d';
-                } else if (y >= 28 && y <= 31) {
-                    textures[1][idx] = '#eadeca';
+                // 1. ЖИЛОЙ ДОМ (Реалистичный терракотовый кирпич)
+                if (y % 8 === 0 || (x % 16 === 0 && Math.floor(y / 8) % 2 === 0) || ((x + 8) % 16 === 0 && Math.floor(y / 8) % 2 !== 0)) {
+                    textures[1][idx] = '#401e16'; // Глубокие швы кладки
+                } else if ((y >= 8 && y <= 14) || (y >= 60 && y <= 66) || (y >= 114 && y <= 120)) {
+                    textures[1][idx] = blendNoise('#d9ceb6', noise); // Каменные фасадные карнизы
                 } else {
-                    textures[1][idx] = '#9c4431';
+                    // Окна жилого дома (3 этажа, по 2 больших окна)
+                    let isWindow = false;
+                    for (let wRow = 0; wRow < 3; wRow++) {
+                        let wTop = 20 + wRow * 38;
+                        let wBottom = wTop + 24;
+                        for (let wCol = 0; wCol < 2; wCol++) {
+                            let wLeft = 24 + wCol * 50;
+                            let wRight = wLeft + 30;
+
+                            if (x >= wLeft && x < wRight && y >= wTop && y < wBottom) {
+                                isWindow = true;
+                                if (x === wLeft || x === wRight - 1 || y === wTop || y === wBottom - 1 || x === wLeft + 15 || y === wTop + 12) {
+                                    textures[1][idx] = '#2b1a0d'; // Деревянные рамы окон
+                                } else {
+                                    textures[1][idx] = '#fae19c'; // Мягкий внутренний свет комнат
+                                }
+                            }
+                        }
+                    }
+                    if (!isWindow) textures[1][idx] = blendNoise('#ab4e3c', noise);
                 }
 
-                // 2. Старая каменная башня
-                textures[2][idx] = (y % 16 === 0 || x % 16 === 0) ? '#3a3835' : '#737068';
+                // 2. СТАРАЯ ГОРОДСКАЯ БАШНЯ (Тесаный массивный известняк)
+                if (y % 32 === 0 || x % 32 === 0) {
+                    textures[2][idx] = '#2b2a27';
+                } else {
+                    textures[2][idx] = blendNoise('#736f66', noise * 2);
+                }
 
-                // 3-6. Научные павильоны (яркие цвета со светящимися неоновыми узорами приборов)
-                let isFrame = (x < 4 || x > 60 || y < 4 || y > 60 || y % 20 === 0 || x % 20 === 0);
-                textures[3][idx] = isFrame ? '#1a4c6d' : '#29b6f6'; // Паровая машина (Синий)
-                textures[4][idx] = isFrame ? '#43a047' : '#81c784'; // Кислород (Зелёный)
-                textures[5][idx] = isFrame ? '#e65100' : '#ffb74d'; // Громоотвод (Оранжевый)
-                textures[6][idx] = isFrame ? '#4a148c' : '#ba68c8'; // Вакцина (Фиолетовый)
+                // ГЕНЕРАЦИЯ СТАНЦИЙ В ВИДЕ ПОЛНОЦЕННЫХ ЗДАНИЙ РАЗНЫХ АРХИТЕКТУРНЫХ СТИЛЕЙ
+                function makeStationFacade(baseColor, trimColor, windowLight, typeId) {
+                    // Прорисовка фундамента и декоративных колонн по бокам дома
+                    if (y > 105 || x < 12 || x > 116) {
+                        textures[typeId][idx] = blendNoise(trimColor, noise);
+                    } else if ((y >= 14 && y <= 20) || (y >= 62 && y <= 68)) {
+                        textures[typeId][idx] = blendNoise(trimColor, noise); // Горизонтальные межэтажные перекрытия
+                    } else {
+                        // Аристократические арочные окна XVIII века
+                        let isWin = false;
+                        for (let wR = 0; wR < 2; wR++) {
+                            let wT = 26 + wR * 44;
+                            let wB = wT + 28;
+                            for (let wC = 0; wC < 2; wC++) {
+                                let wL = 28 + wC * 46;
+                                let wR_edge = wL + 26;
+
+                                if (x >= wL && x < wR_edge && y >= wT && y < wB) {
+                                    isWin = true;
+                                    // Усложненный арочный переплет рам
+                                    let isFrame = (x === wL || x === wR_edge - 1 || y === wT || y === wB - 1 || x === wL + 13 || y === wT + 12 || (y < wT + 8 && Math.abs(x - (wL + 13)) % 4 === 0));
+                                    textures[typeId][idx] = isFrame ? '#1f1a14' : windowLight;
+                                }
+                            }
+                        }
+                        if (!isWin) textures[typeId][idx] = blendNoise(baseColor, noise);
+                    }
+                }
+
+                // Станция 1 (Дом Паровой Машины): Королевский Сине-Голубой фасад, бежевая отделка
+                makeStationFacade('#2b547e', '#e5d3b3', '#fff0b3', 3);
+                // Станция 2 (Дом Химии): Академический Мятно-Зеленый фасад, белый камень
+                makeStationFacade('#4a7c59', '#f5f5f5', '#fae8b4', 4);
+                // Станция 3 (Дом Физики): Пастельно-Оранжевый кирпичный особняк, серый гранит
+                makeStationFacade('#cf7a42', '#6b6b6b', '#fff2cc', 5);
+                // Станция 4 (Дом Медицины): Викторианский Бордово-Пурпурный павильон, слоновая кость
+                makeStationFacade('#663344', '#fdf6e2', '#fceaa4', 6);
             }
         }
     }
-    createProceduralTextures();
-    // --- БАЗА ЗНАНИЙ И КООРДИНАТЫ НАУЧНЫХ СТАНЦИЙ ---
+    generateUltraTextures();
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Европа XVIII века: Высококачественный 3D Музей</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body, html { width: 100%; height: 100%; overflow: hidden; background-color: #060403; font-family: 'Georgia', serif; display: flex; justify-content: center; align-items: center; }
+        
+        #game-view-wrapper { position: relative; width: 800px; height: 600px; box-shadow: 0 0 80px rgba(0,0,0,0.95); border: 5px solid #3d2514; border-radius: 10px; overflow: hidden; }
+        canvas { display: block; width: 100%; height: 100%; background-color: #060810; }
+        
+        #ui-parchment { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 85%; max-width: 520px; background: #f7f1da; color: #26170c; padding: 30px; border-radius: 6px; border: 12px double #4a321a; box-shadow: 0 30px 80px rgba(0,0,0,0.95); text-align: center; display: none; z-index: 500; background-image: radial-gradient(circle, #faf6eb 50%, #e3ce9c 100%); }
+        .scroll-title { font-size: 21px; font-weight: bold; color: #4a2f13; margin-bottom: 14px; border-bottom: 3px double #8d6e63; padding-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; text-shadow: 1px 1px 0px rgba(255,255,255,0.5); }
+        .scroll-text { font-size: 14px; line-height: 1.6; text-align: justify; margin-bottom: 15px; color: #3e2723; font-style: italic; }
+        
+        .station-badge { display: inline-block; background: #5c3a21; color: #f7f1da; padding: 5px 12px; font-size: 11px; border-radius: 4px; text-transform: uppercase; margin-bottom: 12px; font-weight: bold; letter-spacing: 1px; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+        .close-btn { background: #4a321a; color: white; border: 1px solid #26170c; padding: 10px 24px; font-size: 12px; font-weight: bold; border-radius: 4px; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; margin-top: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.3); }
+        
+        #controls-hint { position: absolute; bottom: 15px; left: 15px; color: #fcf8f2; font-size: 12px; background: rgba(12, 8, 5, 0.85); padding: 10px 16px; border-radius: 5px; pointer-events: none; border: 1px solid #5c3a21; line-height: 1.5; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+    </style>
+</head>
+<body>
+
+<div id="game-view-wrapper">
+    <canvas id="gameCanvas" width="800" height="600"></canvas>
+    
+    <div id="ui-parchment">
+        <div class="station-badge" id="station-label">Научная станция</div>
+        <div class="scroll-title" id="station-title">Название открытия</div>
+        <p class="scroll-text" id="station-text">Описание...</p>
+        <button class="close-btn" onclick="closeStationUI()">Продолжить путь</button>
+    </div>
+
+    <div id="controls-hint">
+        <strong>Прогулка по Научному Кварталу:</strong><br>
+        • Движение: клавиши <b>W / S</b> (или Стрелки Вверх / Вниз)<br>
+        • Поворот обзора: клавиши <b>A / D</b> (или Стрелки Влево / Вправо)
+    </div>
+</div>
+
+<script>
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+
+    const MAP_WIDTH = 12;
+    const MAP_HEIGHT = 12;
+    let playerX = 6.5;
+    let playerY = 6.5;
+    let playerAngle = 0.0; 
+    
+    const FOV = Math.PI / 3; 
+    const HALF_FOV = FOV / 2;
+    const NUM_RAYS = 400; 
+    const STEP_ANGLE = FOV / NUM_RAYS;
+    const MAX_DEPTH = 16.0;
+
+    const gameMap = [];
+    const keys = { Left: false, Right: false, Forward: false, Backward: false };
+    let activeStation = null;
+
+    const TEX_SIZE = 128;
+    const textures = {
+        1: new Array(TEX_SIZE * TEX_SIZE), 
+        2: new Array(TEX_SIZE * TEX_SIZE), 
+        3: new Array(TEX_SIZE * TEX_SIZE), 
+        4: new Array(TEX_SIZE * TEX_SIZE), 
+        5: new Array(TEX_SIZE * TEX_SIZE), 
+        6: new Array(TEX_SIZE * TEX_SIZE)  
+    };
+
+    function blendNoise(hex, noise) {
+        let r = parseInt(hex.slice(1,3), 16) + noise;
+        let g = parseInt(hex.slice(3,5), 16) + noise;
+        let b = parseInt(hex.slice(5,7), 16) + noise;
+        r = Math.max(0, Math.min(255, r));
+        g = Math.max(0, Math.min(255, g));
+        b = Math.max(0, Math.min(255, b));
+        return `rgb(${r},${g},${b})`;
+    }
+
+    function generateUltraTextures() {
+        for (let y = 0; y < TEX_SIZE; y++) {
+            for (let x = 0; x < TEX_SIZE; x++) {
+                let idx = y * TEX_SIZE + x;
+                let noise = Math.floor(Math.random() * 16) - 8;
+
+                // 1. ЖИЛОЙ ДОМ (Реалистичный терракотовый кирпич)
+                if (y % 8 === 0 || (x % 16 === 0 && Math.floor(y / 8) % 2 === 0) || ((x + 8) % 16 === 0 && Math.floor(y / 8) % 2 !== 0)) {
+                    textures[idx] = '#401e16'; 
+                } else if ((y >= 8 && y <= 14) || (y >= 60 && y <= 66) || (y >= 114 && y <= 120)) {
+                    textures[idx] = blendNoise('#d9ceb6', noise); 
+                } else {
+                    let isWindow = false;
+                    for (let wRow = 0; wRow < 3; wRow++) {
+                        let wTop = 20 + wRow * 38;
+                        let wBottom = wTop + 24;
+                        for (let wCol = 0; wCol < 2; wCol++) {
+                            let wLeft = 24 + wCol * 50;
+                            let wRight = wLeft + 30;
+                            if (x >= wLeft && x < wRight && y >= wTop && y < wBottom) {
+                                isWindow = true;
+                                if (x === wLeft || x === wRight - 1 || y === wTop || y === wBottom - 1 || x === wLeft + 15 || y === wTop + 12) {
+                                    textures[idx] = '#2b1a0d'; 
+                                } else {
+                                    textures[idx] = '#fae19c'; 
+                                }
+                            }
+                        }
+                    }
+                    if (!isWindow) textures[idx] = blendNoise('#ab4e3c', noise);
+                }
+
+                // 2. СТАРАЯ ГОРОДСКАЯ БАШНЯ
+                textures[idx] = (y % 32 === 0 || x % 32 === 0) ? '#2b2a27' : blendNoise('#736f66', noise * 2);
+
+                // Генерация фасадов для станций-особняков
+                function makeStationFacade(baseColor, trimColor, windowLight, typeId) {
+                    if (y > 105 || x < 12 || x > 116) {
+                        textures[typeId][idx] = blendNoise(trimColor, noise);
+                    } else if ((y >= 14 && y <= 20) || (y >= 62 && y <= 68)) {
+                        textures[typeId][idx] = blendNoise(trimColor, noise); 
+                    } else {
+                        let isWin = false;
+                        for (let wR = 0; wR < 2; wR++) {
+                            let wT = 26 + wR * 44;
+                            let wB = wT + 28;
+                            for (let wC = 0; wC < 2; wC++) {
+                                let wL = 28 + wC * 46;
+                                let wR_edge = wL + 26;
+                                if (x >= wL && x < wR_edge && y >= wT && y < wB) {
+                                    isWin = true;
+                                    let isFrame = (x === wL || x === wR_edge - 1 || y === wT || y === wB - 1 || x === wL + 13 || y === wT + 12);
+                                    textures[typeId][idx] = isFrame ? '#1f1a14' : windowLight;
+                                }
+                            }
+                        }
+                        if (!isWin) textures[typeId][idx] = blendNoise(baseColor, noise);
+                    }
+                }
+
+                makeStationFacade('#2b547e', '#e5d3b3', '#fff0b3', 3); // Станция 1 (Синий)
+                makeStationFacade('#4a7c59', '#f5f5f5', '#fae8b4', 4); // Станция 2 (Зеленый)
+                makeStationFacade('#cf7a42', '#6b6b6b', '#fff2cc', 5); // Станция 3 (Оранжевый)
+                makeStationFacade('#663344', '#fdf6e2', '#fceaa4', 6); // Станция 4 (Пурпурный)
+            }
+        }
+    }
+    generateUltraTextures();
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Европа XVIII века: 3D Музей HQ</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body, html { width: 100%; height: 100%; overflow: hidden; background-color: #060403; font-family: 'Georgia', serif; display: flex; justify-content: center; align-items: center; }
+        #game-view-wrapper { position: relative; width: 800px; height: 600px; box-shadow: 0 0 80px rgba(0,0,0,0.95); border: 5px solid #3d2514; border-radius: 10px; overflow: hidden; }
+        canvas { display: block; width: 100%; height: 100%; background-color: #060810; }
+        #ui-parchment { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 85%; max-width: 520px; background: #f7f1da; color: #26170c; padding: 30px; border-radius: 6px; border: 12px double #4a321a; box-shadow: 0 30px 80px rgba(0,0,0,0.95); text-align: center; display: none; z-index: 500; background-image: radial-gradient(circle, #faf6eb 50%, #e3ce9c 100%); }
+        .scroll-title { font-size: 21px; font-weight: bold; color: #4a2f13; margin-bottom: 14px; border-bottom: 3px double #8d6e63; padding-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; }
+        .scroll-text { font-size: 14px; line-height: 1.6; text-align: justify; margin-bottom: 15px; color: #3e2723; font-style: italic; }
+        .station-badge { display: inline-block; background: #5c3a21; color: #f7f1da; padding: 5px 12px; font-size: 11px; border-radius: 4px; text-transform: uppercase; margin-bottom: 12px; font-weight: bold; }
+        .close-btn { background: #4a321a; color: white; border: 1px solid #26170c; padding: 10px 24px; font-size: 12px; font-weight: bold; border-radius: 4px; cursor: pointer; text-transform: uppercase; }
+        #controls-hint { position: absolute; bottom: 15px; left: 15px; color: #fcf8f2; font-size: 12px; background: rgba(12, 8, 5, 0.85); padding: 10px 16px; border-radius: 5px; pointer-events: none; border: 1px solid #5c3a21; line-height: 1.5; }
+    </style>
+</head>
+<body>
+<div id="game-view-wrapper">
+    <canvas id="gameCanvas" width="800" height="600"></canvas>
+    <div id="ui-parchment">
+        <div class="station-badge" id="station-label">Станция</div>
+        <div class="scroll-title" id="station-title">Открытие</div>
+        <p class="scroll-text" id="station-text">Описание...</p>
+        <button class="close-btn" onclick="closeStationUI()">В путь</button>
+    </div>
+    <div id="controls-hint">
+        <strong>Научный Квартал 3D:</strong><br>
+        • Ходьба: клавиши <b>W / S</b> (Стрелки Вверх/Вниз)<br>
+        • Обзор: клавиши <b>A / D</b> (Стрелки Влево/Вправо)
+    </div>
+</div>
+<script>
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    const MAP_WIDTH = 12, MAP_HEIGHT = 12;
+    let playerX = 6.5, playerY = 6.5, playerAngle = 0.0; 
+    const FOV = Math.PI / 3, HALF_FOV = FOV / 2;
+    const NUM_RAYS = 400, STEP_ANGLE = FOV / NUM_RAYS, MAX_DEPTH = 16.0;
+    const gameMap = [];
+    const keys = { Left: false, Right: false, Forward: false, Backward: false };
+    let activeStation = null;
+
+    const TEX_SIZE = 128;
+    const textures = {
+        1: new Array(TEX_SIZE * TEX_SIZE), 2: new Array(TEX_SIZE * TEX_SIZE), 
+        3: new Array(TEX_SIZE * TEX_SIZE), 4: new Array(TEX_SIZE * TEX_SIZE), 
+        5: new Array(TEX_SIZE * TEX_SIZE), 6: new Array(TEX_SIZE * TEX_SIZE)  
+    };
+
+    function blendNoise(hex, noise) {
+        let r = Math.max(0, Math.min(255, parseInt(hex.slice(1,3), 16) + noise));
+        let g = Math.max(0, Math.min(255, parseInt(hex.slice(3,5), 16) + noise));
+        let b = Math.max(0, Math.min(255, parseInt(hex.slice(5,7), 16) + noise));
+        return `rgb(${r},${g},${b})`;
+    }
+
+    function generateUltraTextures() {
+        for (let y = 0; y < TEX_SIZE; y++) {
+            for (let x = 0; x < TEX_SIZE; x++) {
+                let idx = y * TEX_SIZE + x;
+                let noise = Math.floor(Math.random() * 14) - 7;
+
+                // 1. Текстура обычного кирпичного дома
+                if (y % 8 === 0 || (x % 16 === 0 && Math.floor(y/8) % 2 === 0)) {
+                    textures[idx] = '#401e16'; 
+                } else if ((y >= 8 && y <= 12) || (y >= 60 && y <= 64)) {
+                    textures[idx] = blendNoise('#d9ceb6', noise); 
+                } else {
+                    let isWin = false;
+                    for (let r = 0; r < 3; r++) {
+                        let t = 20 + r * 38;
+                        if (y >= t && y < t + 24 && ((x >= 24 && x < 54) || (x >= 74 && x < 104))) {
+                            isWin = true;
+                            let eX = x >= 24 && x < 54 ? 24 : 74;
+                            textures[idx] = (x === eX || x === eX+29 || y === t || y === t+23 || x === eX+15 || y === t+12) ? '#2b1a0d' : '#fae19c';
+                        }
+                    }
+                    if (!isWin) textures[idx] = blendNoise('#ab4e3c', noise);
+                }
+
+                // 2. Старая каменная ратушная башня
+                textures[idx] = (y % 32 === 0 || x % 32 === 0) ? '#2b2a27' : blendNoise('#736f66', noise * 2);
+
+                // Функция генерации текстур станций в виде полноценных европейских особняков
+                function makeStation(bCol, tCol, wCol, tId) {
+                    if (y > 105 || x < 12 || x > 116 || (y >= 14 && y <= 20) || (y >= 62 && y <= 68)) {
+                        textures[tId][idx] = blendNoise(tCol, noise);
+                    } else {
+                        let isW = false;
+                        for (let r = 0; r < 2; r++) {
+                            let t = 26 + r * 44;
+                            for (let c = 0; c < 2; c++) {
+                                let l = 28 + c * 46;
+                                if (x >= l && x < l + 26 && y >= t && y < t + 28) {
+                                    isW = true;
+                                    textures[tId][idx] = (x === l || x === l + 25 || y === t || y === t + 27 || x === l + 13 || y === t + 12) ? '#1f1a14' : wCol;
+                                }
+                            }
+                        }
+                        if (!isW) textures[tId][idx] = blendNoise(bCol, noise);
+                    }
+                }
+                makeStation('#2b547e', '#e5d3b3', '#fff0b3', 3); // Особняк 1: Синий
+                makeStation('#4a7c59', '#f5f5f5', '#fae8b4', 4); // Особняк 2: Зеленый
+                makeStation('#cf7a42', '#6b6b6b', '#fff2cc', 5); // Особняк 3: Оранжевый
+                makeStation('#663344', '#fdf6e2', '#fceaa4', 6); // Особняк 4: Пурпурный
+            }
+        }
+    }
+    generateUltraTextures();
+    // --- ИСТОРИЧЕСКАЯ БАЗА ДАННЫХ ДЛЯ СТАНЦИЙ-ДОМОВ ---
     const stationsInfo = {
         3: {
-            label: "Станция 1 • Промышленность",
+            label: "Особняк 1 • Промышленность",
             title: "Паровая машина Джеймса Уатта (1776 г.)",
             text: "В XVIII веке ручной труд сменился машинным. Модернизация парового двигателя Уаттом позволила использовать его на ткацких фабриках, рудниках и заводах. Это изобретение стало сердцем Промышленной революции, превратив Англию, а затем и всю Европу в мировую индустриальную державу."
         },
         4: {
-            label: "Станция 2 • Химия",
+            label: "Лаборатория 2 • Химия",
             title: "Открытие кислорода и падение Флогистона (1774 г.)",
             text: "Джозеф Пристли и Антуан Лавуазье выделили чистый кислород и доказали его роль в горении и дыхании. До этого ученые ошибочно верили в существование «флогистона» — неуловимой материи огня. Открытие заложило основы современной научной химии и весового анализа элементов."
         },
         5: {
-            label: "Станция 3 • Физика",
+            label: "Академия 3 • Физика",
             title: "Укрощение молнии Бенджамином Франклином (1752 г.)",
             text: "Проведя знаменитый опыт с воздушным змеем в грозу, Франклин доказал электрическую природу молний. Он разработал теорию положительного и отрицательного зарядов и изобрел громоотвод. Это спасло тысячи европейских городов от катастрофических пожаров, превратив стихию в объект физики."
         },
         6: {
-            label: "Станция 4 • Медицина",
+            label: "Госпиталь 4 • Медицина",
             title: "Первая в мире вакцина Эдварда Дженнера (1796 г.)",
             text: "Натуральная оспа веками выкашивала целые поколения Европы. Английский врач Эдвард Дженнер заметил, что доярки, переболевшие безопасной коровьей оспой, не заражаются человеческой. Он создал первую в истории вакцину, заложив фундамент под спасительную науку иммунологию."
         }
     };
 
-    // --- РУЧНАЯ СБОРКА КАРТЫ С УЧЕТОМ КООРДИНАТ СТАНЦИЙ ---
+    // Инициализация сетки пустой карты
     for (let i = 0; i < 12; i++) {
         gameMap[i] = new Array(12).fill(0);
     }
-    // Внешние стены-дома
+    
+    // Фоновые жилые дома по периметру мира
     for (let i = 0; i < 12; i++) {
-        gameMap[0][i] = 1;
-        gameMap[11][i] = 1;
-        gameMap[i][0] = 1;
-        gameMap[i][11] = 1;
+        gameMap[i] = 1; gameMap[i][11] = 1;
+        gameMap[0][i] = 1; gameMap[11][i] = 1;
     }
-    // Угловые оборонительные башни города
+    
+    // Сторожевые каменные башни по углам города
     gameMap[0][0] = 2; gameMap[0][11] = 2;
     gameMap[11][0] = 2; gameMap[11][11] = 2;
 
-    // Расставляем 4 научные станции в центре площади
-    gameMap[4][4] = 3; // Паровая машина (Синяя)
-    gameMap[4][7] = 4; // Кислород (Зелёная)
-    gameMap[7][4] = 5; // Громоотвод (Оранжевая)
-    gameMap[7][7] = 6; // Вакцина (Фиолетовая)
-
-    // --- ДВИЖОК ТЕКСТУРИРОВАНИЯ И РАСЧЁТА ЛУЧЕЙ ---
+    // Станции в виде особняков расставлены на площади
+    gameMap[3][3] = 3; // Синий особняк промышленности
+    gameMap[3][8] = 4; // Зелёная лаборатория химии
+    gameMap[8][3] = 5; // Оранжевая академия физики
+    gameMap[8][8] = 6; // Пурпурный госпиталь медицины
+    // --- ВЫСОКОКАЧЕСТВЕННЫЙ 3D РЕНДЕРЕР (RAYCASTING + SHADING) ---
     function render3D() {
         let skyGrad = ctx.createLinearGradient(0, 0, 0, 300);
-        skyGrad.addColorStop(0, '#090b14');
-        skyGrad.addColorStop(0.7, '#1b2236');
-        skyGrad.addColorStop(1, '#3b2a3a');
+        skyGrad.addColorStop(0, '#04060f');
+        skyGrad.addColorStop(0.5, '#121829');
+        skyGrad.addColorStop(1, '#2d1f2d');
         ctx.fillStyle = skyGrad;
         ctx.fillRect(0, 0, 800, 300);
 
         let floorGrad = ctx.createLinearGradient(0, 300, 0, 600);
-        floorGrad.addColorStop(0, '#121110');
-        floorGrad.addColorStop(1, '#050504');
+        floorGrad.addColorStop(0, '#0f0e0d');
+        floorGrad.addColorStop(1, '#030302');
         ctx.fillStyle = floorGrad;
         ctx.fillRect(0, 300, 800, 300);
 
-        ctx.fillStyle = 'rgba(25, 20, 15, 0.4)';
-        for (let y = 310; y < 600; y += 15) {
+        ctx.fillStyle = 'rgba(15, 12, 10, 0.5)';
+        for (let y = 305; y < 600; y += 12) {
             ctx.fillRect(0, y, 800, 1);
         }
 
@@ -184,7 +505,7 @@
             let textureX = 0;
 
             while (!hitWall && distanceToWall < MAX_DEPTH) {
-                distanceToWall += 0.015;
+                distanceToWall += 0.012; 
                 let checkX = Math.floor(playerX + cos * distanceToWall);
                 let checkY = Math.floor(playerY + sin * distanceToWall);
 
@@ -201,7 +522,7 @@
                         let blockX = hitX - Math.floor(hitX);
                         let blockY = hitY - Math.floor(hitY);
                         
-                        if (Math.abs(blockY) < 0.02 || Math.abs(blockY - 1) < 0.02) {
+                        if (Math.abs(blockY) < 0.015 || Math.abs(blockY - 1) < 0.015) {
                             textureX = Math.floor(blockX * TEX_SIZE);
                         } else {
                             textureX = Math.floor(blockY * TEX_SIZE);
@@ -212,13 +533,13 @@
             }
 
             let correctedDistance = distanceToWall * Math.cos(rayAngle - playerAngle);
-            let wallHeight = Math.min(600, Math.floor(400 / correctedDistance));
+            let wallHeight = Math.min(600, Math.floor(450 / correctedDistance));
             let screenX = i * 2; 
             let wallTop = Math.floor((600 - wallHeight) / 2);
             let wallBottom = wallTop + wallHeight;
 
             if (distanceToWall < MAX_DEPTH) {
-                let shade = Math.max(0.15, 1 - (distanceToWall / MAX_DEPTH));
+                let shade = Math.max(0.12, 1 - (distanceToWall / MAX_DEPTH));
                 const texArray = textures[wallType];
                 
                 for (let screenY = wallTop; screenY < wallBottom; screenY++) {
@@ -228,29 +549,36 @@
                     ctx.fillRect(screenX, screenY, 2, 1);
                 }
 
-                let roofHeight = wallHeight * 0.35;
-                ctx.fillStyle = `rgb(${110 * shade}, ${35 * shade}, ${25 * shade})`;
+                let roofHeight = wallHeight * 0.4;
+                ctx.fillStyle = `rgb(${120 * shade}, ${38 * shade}, ${28 * shade})`;
                 ctx.beginPath();
                 ctx.moveTo(screenX, wallTop);
                 ctx.lineTo(screenX + 2, wallTop);
                 ctx.lineTo(screenX + 1, wallTop - roofHeight);
                 ctx.fill();
 
-                if (distanceToWall > 1.2) {
-                    let shadowAlpha = Math.min(0.85, (distanceToWall / MAX_DEPTH));
-                    ctx.fillStyle = `rgba(10, 13, 26, ${shadowAlpha})`;
+                if (wallHeight > 40) {
+                    ctx.fillStyle = `rgba(30, 10, 5, ${0.3 * shade})`;
+                    for (let ry = wallTop - 2; ry > wallTop - roofHeight; ry -= Math.max(2, wallHeight / 30)) {
+                        ctx.fillRect(screenX, Math.floor(ry), 2, 1);
+                    }
+                }
+
+                if (distanceToWall > 1.0) {
+                    let shadowAlpha = Math.min(0.88, (distanceToWall / MAX_DEPTH));
+                    ctx.fillStyle = `rgba(6, 8, 16, ${shadowAlpha})`;
                     ctx.fillRect(screenX, wallTop, 2, wallHeight);
                 }
             }
         }
     }
-    // --- ОБРАБОТКА ИНТЕРФЕЙСА СТАНЦИЙ ПРИ ПРИБЛИЖЕНИИ ---
+
+    // --- АВТОМАТИЧЕСКИЕ ТРИГГЕРЫ СТАНЦИЙ ПРИ ПРИБЛИЖЕНИИ ---
     function checkStationProximity() {
         let currentBlockX = Math.floor(playerX);
         let currentBlockY = Math.floor(playerY);
         let foundStation = null;
 
-        // Сканируем соседние клетки вокруг игрока
         const checkOffsets = [
             {x: 0, y: 1}, {x: 0, y: -1}, {x: 1, y: 0}, {x: -1, y: 0},
             {x: 1, y: 1}, {x: -1, y: -1}, {x: 1, y: -1}, {x: -1, y: 1}
@@ -262,14 +590,13 @@
             
             if (targetX >= 0 && targetX < MAP_WIDTH && targetY >= 0 && targetY < MAP_HEIGHT) {
                 let tile = gameMap[targetY][targetX];
-                if (tile >= 3 && tile <= 6) { // Если рядом одна из 4-х научных станций
+                if (tile >= 3 && tile <= 6) { 
                     foundStation = tile;
                     break;
                 }
             }
         }
 
-        // Если нашли станцию рядом — выводим свиток с научным фактом
         if (foundStation && activeStation !== foundStation) {
             activeStation = foundStation;
             const info = stationsInfo[foundStation];
@@ -278,7 +605,6 @@
             document.getElementById('station-text').innerText = info.text;
             document.getElementById('ui-parchment').style.display = 'block';
         } else if (!foundStation && activeStation !== null) {
-            // Если игрок отошел от станции, автоматически закрываем окно
             closeStationUI();
         }
     }
@@ -288,7 +614,7 @@
         activeStation = null;
     }
 
-    // --- ОБРАБОТКА ДВИЖЕНИЯ И КОЛЛИЗИЙ (КЛАВИАТУРА) ---
+    // --- ОБРАБОТКА НАЖАТИЙ КЛАВИШ ---
     window.addEventListener('keydown', function(e) {
         if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A' || e.key === 'ф' || e.key === 'Ф') keys.Left = true;
         if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D' || e.key === 'в' || e.key === 'В') keys.Right = true;
@@ -303,12 +629,11 @@
         if (e.key === 'ArrowDown' || e.key === 's' || e.key === 'S' || e.key === 'ы' || e.key === 'Ы') keys.Backward = false;
     });
 
-    // Расчет перемещения и скольжения вдоль стен (коллизии)
+    // --- ФИЗИКА ПЕРЕМЕЩЕНИЯ И СКОЛЬЖЕНИЯ ВДОЛЬ СТЕН ---
     function movePlayer() {
-        let moveSpeed = 0.04;
-        let rotateSpeed = 0.035;
+        let moveSpeed = 0.045;
+        let rotateSpeed = 0.038;
 
-        // Поворот камеры
         if (keys.Left) {
             playerAngle -= rotateSpeed;
             if (playerAngle < 0) playerAngle += Math.PI * 2;
@@ -318,7 +643,6 @@
             if (playerAngle > Math.PI * 2) playerAngle -= Math.PI * 2;
         }
 
-        // Ходьба вперёд / назад с проверкой плотных объектов на карте
         let newX = playerX;
         let newY = playerY;
 
@@ -331,20 +655,15 @@
             newY -= Math.sin(playerAngle) * moveSpeed;
         }
 
-        // Простая и надежная проверка коллизий: если клетка пустая (0) — разрешаем шаг
-        if (gameMap[Math.floor(playerY)][Math.floor(newX)] === 0) {
-            playerX = newX;
-        }
-        if (gameMap[Math.floor(newY)][Math.floor(playerX)] === 0) {
-            playerY = newY;
-        }
+        if (gameMap[Math.floor(playerY)][Math.floor(newX)] === 0) playerX = newX;
+        if (gameMap[Math.floor(newY)][Math.floor(playerX)] === 0) playerY = newY;
     }
 
-    // --- ИГРОВОЙ ЦИКЛ ОБНОВЛЕНИЯ ЭКРАНА ---
+    // --- ИГРОВОЙ ЦИКЛ ---
     function updateGame() {
-        movePlayer();             // Передвигаем персонажа
-        checkStationProximity();   // Проверяем, не стоим ли мы у научной станции
-        render3D();               // Отрисовываем 3D окружение
+        movePlayer();
+        checkStationProximity();
+        render3D();
         requestAnimationFrame(updateGame);
     }
 
