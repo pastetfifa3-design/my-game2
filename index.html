@@ -34,9 +34,10 @@
     </div>
 
     <div id="controls-hint">
-        <strong>Прогулка по Научному Кварталу:</strong><br>
+        <strong>Прогулка по Научному Кварталу XVIII века:</strong><br>
         • Движение: клавиши <b>W / S</b> (или Стрелки Вверх / Вниз)<br>
-        • Поворот обзора: клавиши <b>A / D</b> (или Стрелки Влево / Вправо)
+        • Поворот обзора: клавиши <b>A / D</b> (или Стрелки Влево / Вправо)<br>
+        • <b>Цель:</b> Найдите 4 разноцветных особняка с великими открытиями!
     </div>
 </div>
 
@@ -44,34 +45,69 @@
     const canvas = document.getElementById('gameCanvas');
     const ctx = canvas.getContext('2d');
 
+    // КАРТА ГОРОДА (0 - дорога, 1 - обычный дом, 2 - каменная башня, 3-6 - научные станции)
+    const gameMap = [,
+ ,
+ ,
+ ,
+ ,
+ ,
+ ,
+ ,
+ ,
+ ,
+ ,
+        [2,2,2,2,2,2,2,2,2,2,2,2]
+    ];
+
     const MAP_WIDTH = 12;
     const MAP_HEIGHT = 12;
     let playerX = 6.5;
     let playerY = 6.5;
     let playerAngle = 0.0; 
-    
     const FOV = Math.PI / 3; 
     const HALF_FOV = FOV / 2;
     const NUM_RAYS = 400; 
     const STEP_ANGLE = FOV / NUM_RAYS;
     const MAX_DEPTH = 16.0;
 
-    const gameMap = [];
     const keys = { Left: false, Right: false, Forward: false, Backward: false };
     let activeStation = null;
 
-    // Резервируем буферы под текстуры высокого разрешения (128x128 пикселей)
-    const TEX_SIZE = 128;
-    const textures = {
-        1: new Array(TEX_SIZE * TEX_SIZE), // Обычный дом
-        2: new Array(TEX_SIZE * TEX_SIZE), // Каменная башня
-        3: new Array(TEX_SIZE * TEX_SIZE), // Синий особняк
-        4: new Array(TEX_SIZE * TEX_SIZE), // Зелёный особняк
-        5: new Array(TEX_SIZE * TEX_SIZE), // Оранжевый особняк
-        6: new Array(TEX_SIZE * TEX_SIZE)  // Пурпурный особняк
+    // Описание научных открытий XVIII века для станций
+    const stationsInfo = {
+        3: {
+            label: "Станция 1 • Физика и Атмосфера (Синий особняк)",
+            title: "Громоотвод Бенджамина Франклина (1752)",
+            text: "В ходе знаменитого эксперимента с воздушным змеем во время грозы Франклин доказал электрическую природу молнии. Это привело к созданию молниеотвода, который спас тысячи деревянных европейских городов от разрушительных пожаров и перевернул представления об электричестве."
+        },
+        4: {
+            label: "Станция 2 • Промышленный переворот (Зелёный особняк)",
+            title: "Паровая машина Джеймса Уатта (1776)",
+            text: "Усовершенствование парового двигателя Ньюкомена превратило его в универсальный двигатель для фабрик и заводов. Изобретение Уатта ознаменовало начало Первой промышленной революции, заменив мускульную силу людей и животных мощью пара."
+        },
+        5: {
+            label: "Станция 3 • Химия газов (Оранжевый особняк)",
+            title: "Открытие Кислорода Антуаном Лавуазье (1778)",
+            text: "Великий французский химик экспериментально опроверг теорию флогистона и доказал, что воздух состоит из нескольких газов, один из которых поддерживает горение и дыхание. Лавуазье дал ему имя 'Oxygenium', заложив основы современной химии."
+        },
+        6: {
+            label: "Станция 4 • Медицина и Биология (Пурпурный особняк)",
+            title: "Первая в мире вакцина Эдварда Дженнера (1796)",
+            text: "Английский врач Эдвард Дженнер заметил, что доярки, переболевшие безопасной коровьей оспой, не заражаются смертоносной натуральной оспой. Он провёл первое успешное оспопрививание, положив начало эпохе вакцинации и спасши миллионы жизней."
+        }
     };
 
-    // Безопасное подмешивание шума старины без поломок
+    const TEX_SIZE = 128;
+    const textures = {
+        1: new Array(TEX_SIZE * TEX_SIZE), 
+        2: new Array(TEX_SIZE * TEX_SIZE), 
+        3: new Array(TEX_SIZE * TEX_SIZE), 
+        4: new Array(TEX_SIZE * TEX_SIZE), 
+        5: new Array(TEX_SIZE * TEX_SIZE), 
+        6: new Array(TEX_SIZE * TEX_SIZE)  
+    };
+
     function blendNoise(hex, noise) {
         let r = Math.max(0, Math.min(255, parseInt(hex.slice(1,3), 16) + noise));
         let g = Math.max(0, Math.min(255, parseInt(hex.slice(3,5), 16) + noise));
@@ -79,7 +115,6 @@
         return `rgb(${r},${g},${b})`;
     }
 
-    // Процедурный генератор текстур без пропусков строк
     function generateUltraTextures() {
         for (let y = 0; y < TEX_SIZE; y++) {
             for (let x = 0; x < TEX_SIZE; x++) {
@@ -126,10 +161,10 @@
                         if (!isW) textures[tId][idx] = blendNoise(bCol, noise);
                     }
                 }
-                makeStation('#2b547e', '#e5d3b3', '#fff0b3', 3); // Станция 1: Синий
-                makeStation('#4a7c59', '#f5f5f5', '#fae8b4', 4); // Станция 2: Зеленый
-                makeStation('#cf7a42', '#6b6b6b', '#fff2cc', 5); // Станция 3: Оранжевый
-                makeStation('#663344', '#fdf6e2', '#fceaa4', 6); // Станция 4: Пурпурный
+                makeStation('#2b547e', '#e5d3b3', '#fff0b3', 3); 
+                makeStation('#4a7c59', '#f5f5f5', '#fae8b4', 4); 
+                makeStation('#cf7a42', '#6b6b6b', '#fff2cc', 5); 
+                makeStation('#663344', '#fdf6e2', '#fceaa4', 6); 
             }
         }
     }
@@ -244,6 +279,7 @@
             }
         }
     }
+
     // --- АВТОМАТИЧЕСКИЕ ТРИГГЕРЫ СТАНЦИЙ ПРИ ПРИБЛИЖЕНИИ ---
     function checkStationProximity() {
         let currentBlockX = Math.floor(playerX);
@@ -275,14 +311,15 @@
             document.getElementById('station-title').innerText = info.title;
             document.getElementById('station-text').innerText = info.text;
             document.getElementById('ui-parchment').style.display = 'block';
-        } else if (!foundStation && activeStation !== null) {
-            closeStationUI();
         }
     }
 
     function closeStationUI() {
         document.getElementById('ui-parchment').style.display = 'none';
-        activeStation = null;
+        // Отталкиваем игрока назад, чтобы окно не открывалось мгновенно повторно
+        playerX -= Math.cos(playerAngle) * 0.4;
+        playerY -= Math.sin(playerAngle) * 0.4;
+        setTimeout(() => { activeStation = null; }, 500);
     }
 
     // --- ОБРАБОТКА НАЖАТИЙ КЛАВИШ ---
@@ -302,8 +339,8 @@
 
     // --- НАДЁЖНАЯ ФИЗИКА ДВИЖЕНИЯ И СКОЛЬЖЕНИЯ ВДОЛЬ СТЕН ---
     function movePlayer() {
-        let moveSpeed = 0.045;
-        let rotateSpeed = 0.038;
+        let moveSpeed = 0.035;
+        let rotateSpeed = 0.030;
 
         if (keys.Left) {
             playerAngle -= rotateSpeed;
@@ -334,11 +371,14 @@
     // --- ГЛАВНЫЙ ЦИКЛ ОБНОВЛЕНИЯ ДВИЖКА ---
     function updateGame() {
         movePlayer();
-        checkStationProximity();
+        if (activeStation === null) {
+            checkStationProximity();
+        }
         render3D();
         requestAnimationFrame(updateGame);
     }
 
+    // Запуск игры
     updateGame();
 </script>
 </body>
